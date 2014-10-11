@@ -1,0 +1,11 @@
+---
+- name: Creating {{ data_dir }}/bin
+  file:
+    path: "{{ data_dir }}/bin"
+    state: directory
+
+- name: "Installing btsync binary for {{ ansible_architecture }}"
+  src: "data/bin/btsync-{{ ansible_architecture }}"
+  dest: "{{ data_dir }}/bin/btsync"
+  owner: "teacher"
+  mode: 755
