@@ -1,8 +1,9 @@
 #!/bin/bash
 
-PROVREPO=https://github.com/usernamenumber/provision 
+# Configs
+ATBOOT=false
 
-# Get the absolute path of the script
+# Get the absolute path of this script
 cd `dirname $0` > /dev/null
 SCRIPTDIR=$(pwd)
 SCRIPTNAME="$(basename $0)"
@@ -10,11 +11,17 @@ SCRIPTFULLNAME="${SCRIPTDIR}/${SCRIPTNAME}"
 
 # Work backward from the script's location to find
 # the git repository root
-while [ ! -e "$BASEDIR/.git" ] ; 
+REPODIR=$SCRIPTDIR
+while [ ! -d "$REPODIR/.git" ] ; 
 do
-        BASEDIR="$BASEDIR/.." 
+        REPODIR="$REPODIR/.." 
 done
-cd $BASEDIR 
+# Get a nicer looking path with all the '/..'s
+cd $REPODIR
+REPODIR=$(pwd)
+
+# Base dir is assumed to be the parent of the git repo
+cd ..
 BASEDIR=$(pwd)
 
 # Fatal errors
@@ -57,31 +64,17 @@ function is_installed() {
 
 has_internet || note "No net connection found. Some actions will be skipped..." 
 
-is_installed git || apt-get install -y git
-if [ ! -e $BASEDIR/provisioning ]
-then
-	step "Getting provisioning data"
-	has_internet || die "Provisioning not installend, and no Internet connection found. Can't do anything"
-	git clone $PROVREPO $BASEDIR/provisioning
+if ! has_internet
+then 
+    note "No Internet connection. Skipping update of provisioning data"
 else
-	step "Updating existing provisioning data"
-	if ! has_internet
-	then 
-		note "No Internet connection, skipping update of provisioning data"
-	else
-		pushd $BASEDIR/provisioning
-		git pull	
-		popd
-	fi
-fi 
-
-if [ ! -L $0 ]
-	note "Swapping this script for the version in the provisioning repo. The script will now restart."
-	ln -sf provisioning/scripts/$SCRIPTNAME $0
-	exec $0
+    step "Updating provisioning data"
+    pushd $REPODIR
+    git pull
+    popd
 fi
 
-if ! grep $SCRIPTFULLNAME /etc/rc.local &>/dev/null 
+if $ATBOOT && ! grep $SCRIPTFULLNAME /etc/rc.local &>/dev/null 
 then
 	step "Setting the script to run at boot time"
 	# This gets messy because Debian Wheezy's rc.local
@@ -140,7 +133,7 @@ then
 
 	# Fun fact: apparently you can't generate a new passwordless key, but you can make
 	# it passwordless after creating it.
-	# Note the 'from=127.0.0.1' in authorized_keys2. The key can only be used locally.
+	# Note the 'from=127.0.0.1' in authorized_keys2. This key can only be used locally!
 	ssh-keygen -f ~/.ssh/provisioning -N 1234567890 -q
 	ssh-keygen -f ~/.ssh/provisioning -p -P 1234567890 -N '' -q
 	echo $(cat ~/.ssh/provisioning.pub) from=127.0.0.1 >> ~/.ssh/authorized_keys2
