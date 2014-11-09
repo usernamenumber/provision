@@ -2,11 +2,22 @@
 
 PROVREPO=https://github.com/usernamenumber/provision 
 
-pushd `dirname $0` > /dev/null
-BASEDIR=`pwd`
+# Get the absolute path of the script
+cd `dirname $0` > /dev/null
+SCRIPTDIR=$(pwd)
 SCRIPTNAME="$(basename $0)"
-SCRIPTFULLNAME="${BASEDIR}/${SCRIPTNAME}"
+SCRIPTFULLNAME="${SCRIPTDIR}/${SCRIPTNAME}"
 
+# Work backward from the script's location to find
+# the git repository root
+while [ ! -e "$BASEDIR/.git" ] ; 
+do
+        BASEDIR="$BASEDIR/.." 
+done
+cd $BASEDIR 
+BASEDIR=$(pwd)
+
+# Fatal errors
 function die() {
 	echo ""
 	echo "FATAL ERROR: $1" >&2
@@ -14,12 +25,14 @@ function die() {
 	exit 1
 }
 
+# Notifications and warnings
 function note() {
 	echo ""
 	echo "NOTICE: $1" >&2
 	echo ""
 }
 
+# Action messages
 function step() {
 	echo ""
 	echo "== $1"
