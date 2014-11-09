@@ -68,11 +68,25 @@ if [ ! -L $0 ]
 	exec $0
 fi
 
-if ! grep "$SCRIPTFULLNAME" /etc/rc.local
+if ! grep $SCRIPTFULLNAME /etc/rc.local &>/dev/null 
 then
-	step "Setting this script to run at boot"
-	echo "[ -f $SCRIPTFULLNAME ] && $SCRIPTFULLNAME" >> /etc/rc.local
-fi
+	step "Setting the script to run at boot time"
+	# This gets messy because Debian Wheezy's rc.local
+	# has an explicit call to 'exit 0' at the end, so
+	# we can't just append in that case
+	( 
+		if tail -n1 /etc/rc.local | grep '^exit 0'
+		then
+			head -n -1 /etc/rc.local
+			echo ""
+			echo "[ -f $SCRIPTFULLNAME ] && $SCRIPTFULLNAME" 
+			echo "exit 0"
+		else 
+			cat /etc/rc.local
+			echo ""
+			echo "[ -f $SCRIPTFULLNAME ] && $SCRIPTFULLNAME"  
+		fi
+	)  > /etc/rc.local
 
 if dpkg -l language-pack-en-base &> /dev/null
 then
