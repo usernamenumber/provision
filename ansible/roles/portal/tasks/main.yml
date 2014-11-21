@@ -1,0 +1,3 @@
+---
+# copy portal files to web root
+- copy: src=web/index.html dest=/var/www/
