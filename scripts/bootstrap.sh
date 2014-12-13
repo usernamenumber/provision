@@ -87,7 +87,7 @@ then
 else
     step "Updating provisioning data"
     pushd $REPODIR > /dev/null
-    git pull
+    git pull --no-edit origin edxhackathon2014 
     popd > /dev/null
 fi
 
