@@ -5,15 +5,15 @@
 *
 */
 
-$server_name = "{{ inventory_hostname }}";
-$domain_name = "{{ wap__data_domain }}";
-$site_name = "{{ wap__data_ssid }}";
+$server_name = "127.0.0.1";
+$domain_name = "x2go.org";
+$site_name = "x2go";
 
 // Path to the arp command on the local server
 $arp = "/usr/sbin/arp";
 
 // The following file is used to keep track of users
-$users = "{{ wap__userlist }}";
+$users = "/usr/local/tunapanda/data/wap/users";
 
 // Check if we've been redirected by firewall to here.
 // If so redirect to registration address

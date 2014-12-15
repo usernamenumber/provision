@@ -8,5 +8,5 @@ SCRIPTFULLNAME="${SCRIPTDIR}/${SCRIPTNAME}"
 [ -e rules.d ] && mkdir rules.d
 for s in rules.d/*
 do
-    source rules.d/$s
+    source $s
 done

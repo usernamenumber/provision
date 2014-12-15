@@ -9,12 +9,12 @@
     line="bcmdhd op_mode=2"
     regexp="^bcmdhd"
     
--name: Installing hostapd dependencies
+- name: Installing hostapd dependencies
   apt: 
     name={{ item }} 
     state=installed
-    with_items:
-       - hostapd
+  with_items:
+    - hostapd
 
 - name: hostapd configuration
   template:
