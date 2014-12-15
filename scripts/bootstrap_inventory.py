@@ -18,13 +18,19 @@ def disable_all_roles():
             continue
         options[role + "__enabled"] = False
 
+def config_cubietruck():
+    enabled_roles = []
+    #enabled_roles = ["kalite","wikipedia"]
+    disable_all_roles()
+    for role in enabled_roles:
+        options[role + "__enabled"] = True
+    groups.append("cubietruck")
+    groups.append("wap")
+
 # Naively assume that any ARM machine
 # counts as a Cubietruck for provisioning
 if "arm" in platform.machine():
-    disable_all_roles()
-    options["users__enabled"] = True
-    options["invvar"] = "INV"
-    groups.append("cubietruck")
+    config_cubietruck()
 
 args = parser.parse_args()
 if args.list:

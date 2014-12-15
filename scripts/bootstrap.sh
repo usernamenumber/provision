@@ -49,7 +49,12 @@ function has_internet() {
 	if [ -z "$HAS_INTERNET" ]
 	then
 		step "Checking internet access" 
-		ping -c1 www.google.com &> /dev/null
+        if [ -f $SCRIPTDIR/has_internet ] 
+        then
+            $SCRIPTDIR/has_internet
+        else
+		    ping -c1 -t5 www.google.com &> /dev/null
+        fi
 		HAS_INTERNET=$?
 	fi
 	return $HAS_INTERNET
@@ -140,6 +145,12 @@ fi
 
 is_installed ansible || die "Looks like we were unable to install ansible. Maybe a networking problem?"
 
+if has_internet
+then
+	step "Getting required ansible roles"
+	ansible-galaxy install debops.dhcpd
+fi
+	
 if [ ! -f ~/.ssh/provisioning ]
 then
 	step "Generating SSH keys for provisioning"
@@ -161,7 +172,7 @@ ssh -o StrictHostKeyChecking=no localhost echo 'User key works, host key added!'
 step "Running Ansible"
 pwd
 export ANSIBLE_HOST_KEY_CHECKING=False
-ansible-playbook -i $SCRIPTDIR/bootstrap_inventory.py $REPODIR/ansible/main.yml
+ansible-playbook -vvv -i $SCRIPTDIR/bootstrap_inventory.py $REPODIR/ansible/main.yml
 
 echo ""
 echo '*** ALL DONE! ***'
