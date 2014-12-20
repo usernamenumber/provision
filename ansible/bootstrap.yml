@@ -1,0 +1,17 @@
+---
+- hosts: all
+  vars:
+    - bootstrap_script: /usr/local/tunapanda/provision/script/bootstrap.sh
+  tasks:
+    - name: Adding bootstrapping script to rc.local
+      lineinfile:
+        dest="/etc/rc.local"
+        insertbefore='^exit'
+        regexp="bootstrap.sh"
+        line="{{ bootstrap_script }}"
+
+    - name: Scheduling bootstrapping script
+      shell: echo {{ bootstrap_script }} | at now + 1 minute
+
+
+
