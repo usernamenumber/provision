@@ -1,24 +1,16 @@
-#!/bin/bash
+#!/bin/bash -x
 
+(
 # Configs
 ATBOOT=false
+REPOURL=http://github.com/tunapanda/provision
+REPODIR=/usr/local/tunapanda/provision
 
 # Get the absolute path of this script
 cd `dirname $0` > /dev/null
 SCRIPTDIR=$(pwd)
 SCRIPTNAME="$(basename $0)"
 SCRIPTFULLNAME="${SCRIPTDIR}/${SCRIPTNAME}"
-
-# Work backward from the script's location to find
-# the git repository root
-REPODIR=$SCRIPTDIR
-while [ ! -d "$REPODIR/.git" ] ; 
-do
-        REPODIR="$REPODIR/.." 
-done
-# Get a nicer looking path with all the '/..'s
-cd $REPODIR
-REPODIR=$(pwd)
 
 # Base dir is assumed to be the parent of the git repo
 cd ..
@@ -53,7 +45,7 @@ function has_internet() {
         then
             $SCRIPTDIR/has_internet
         else
-		    ping -c1 -t5 www.google.com &> /dev/null
+		    ping -c1 -t5 www.google.com #&> /dev/null
         fi
 		HAS_INTERNET=$?
 	fi
@@ -66,20 +58,17 @@ function is_installed() {
 	return $?
 }
 
-#if [ $1 == '--list' ] 
-#then
-#    echo "YRX"
-#    exit
-#else if [ $1 == "--host" ] 
-#then
-#    echo "%@W" 
-#else
-#    echo "3"
-#fi
-#
-#exit 
+if [ $EUID -ne 0 ]
+then
+	die 'Must be run as root!'
+fi
 
-has_internet || note "No net connection found. Some actions will be skipped..." 
+if [ ! -e "$REPODIR" ]
+then
+    has_internet || die "No provisioning repo and no net connection. Cannot proceed."
+    step "Cloning provisioning repo"
+    git clone --recursive $REPOURL $REPODIR
+fi
 
 if ! has_internet
 then 
@@ -112,68 +101,72 @@ then
 	)  > /etc/rc.local
 fi
 
-if dpkg -l language-pack-en-base &> /dev/null
-then
-	step "Installing missing language pack"
-	has_internet && apt-get install -y language-pack-en-base
-fi
+#if dpkg -l language-pack-en-base &> /dev/null
+#then
+#	step "Installing missing language pack"
+#	has_internet && apt-get install -y --force-yes language-pack-en-base
+#fi
 
-if ! is_installed ansible
-then
-	step "Getting Ansible"
-	has_internet || die "Ansible not installed and no Internet connection found. Can't do anything."
 
-	if [ ! -f /etc/apt/sources.list.d/wheezy-backports.list ] 
+if ! is_installed pip 
+then
+	has_internet || die "Pip is required, but we can't install it without a net connection"	
+	step "Getting pip"
+	if is_installed curl
 	then
-		step "Configuring backports repo"
-		cat > /etc/apt/sources.list.d/wheezy-backports.list <<EOF
-deb http://ftp.debian.org/debian/ wheezy-backports main contrib non-free
-deb-src http://ftp.debian.org/debian/ wheezy-backports main contrib non-free
-EOF
-		apt-get update
+		curl -o - 'https://bootstrap.pypa.io/get-pip.py' | python
+	elif is_installed wget
+	then
+		wget -o - 'https://bootstrap.pypa.io/get-pip.py' | python
+	elif is_installed elinks
+	then
+		elinks -dump 'https://bootstrap.pypa.io/get-pip.py' | python
 	fi
 
-	step "Installing Ansible package"
-	apt-get install -y ansible
-
-	step "Setting up a basic Ansible hosts inventory"
-	cat >> /etc/ansible/hosts <<EOF
-[local]
-127.0.0.1
-EOF
+	is_installed pip || die "Can't install pip. See: https://pip.pypa.io/en/latest/installing.html"
 fi
 
-is_installed ansible || die "Looks like we were unable to install ansible. Maybe a networking problem?"
+
+if ! is_installed ansible 
+then
+	step "Installing Ansible"
+	has_internet || die "Ansible is required, but we can't install it without a net connection"	
+	apt-get install -y python-dev
+	pip install ansible
+	is_installed ansible || die "Something went wrong installing ansible. Cannot continue."
+fi
 
 if has_internet
 then
 	step "Getting required ansible roles"
-	ansible-galaxy install debops.dhcpd
+#	ansible-galaxy install debops.dhcpd
 fi
 	
-if [ ! -f ~/.ssh/provisioning ]
+if [ ! -f /root/.ssh/provisioning ]
 then
 	step "Generating SSH keys for provisioning"
 
 	# Fun fact: apparently you can't generate a new passwordless key, but you can make
 	# it passwordless after creating it.
 	# Note the 'from=127.0.0.1' in authorized_keys2. This key can only be used locally!
-	ssh-keygen -f ~/.ssh/provisioning -N 1234567890 -q
-	ssh-keygen -f ~/.ssh/provisioning -p -P 1234567890 -N '' -q
+	ssh-keygen -f /root/.ssh/provisioning -N 1234567890 -q
+	ssh-keygen -f /root/.ssh/provisioning -p -P 1234567890 -N '' -q
 	echo $(cat ~/.ssh/provisioning.pub) from=127.0.0.1 >> ~/.ssh/authorized_keys2
-	chmod go-rwx ~/.ssh/authorized_keys2
+	chmod go-rwx /root/.ssh/authorized_keys2
 fi
 
 step "Loading SSH keys"
 eval `ssh-agent -s`
-ssh-add ~/.ssh/provisioning
-ssh -o StrictHostKeyChecking=no localhost echo 'User key works, host key added!'
+ssh-add /root/.ssh/provisioning
+ssh-add -l
+ssh -i /root/.ssh/provisioning -o StrictHostKeyChecking=no localhost echo 'User key works, host key added!'
 
 step "Running Ansible"
 pwd
 export ANSIBLE_HOST_KEY_CHECKING=False
-ansible-playbook -vvv -i $SCRIPTDIR/bootstrap_inventory.py $REPODIR/ansible/main.yml
+ansible-playbook -vvv -i $REPODIR/scripts/bootstrap_inventory.py $REPODIR/ansible/main.yml
 
 echo ""
 echo '*** ALL DONE! ***'
 echo ""
+) | tee /var/log/bootstrap.log
