@@ -2,9 +2,14 @@
 
 IPTABLES=/sbin/iptables
 
-for chain in PREROUTING POSTROUTING INPUT OUTPUT FORWARD
-do
-	$IPTABLES -P $chain ACCEPT 
-done
-
-$IPTABLES -F
+$IPTABLES -t nat -P PREROUTING ACCEPT
+$IPTABLES -t nat -P POSTROUTING ACCEPT
+$IPTABLES -t filter -P INPUT ACCEPT
+$IPTABLES -t filter -P OUTPUT ACCEPT
+$IPTABLES -t filter -P FORWARD ACCEPT
+$IPTABLES -t nat -F
+$IPTABLES -t filter -F
+$IPTABLES -t mangle -F
+$IPTABLES -t nat -X
+$IPTABLES -t filter -X
+$IPTABLES -t mangle -X

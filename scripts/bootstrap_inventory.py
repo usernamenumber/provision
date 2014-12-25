@@ -25,7 +25,7 @@ def config_cubietruck():
     for role in enabled_roles:
         options[role + "__enabled"] = True
     groups.append("cubietruck")
-    groups.append("wap")
+    groups.append("portal")
 
 # Naively assume that any ARM machine
 # counts as a Cubietruck for provisioning

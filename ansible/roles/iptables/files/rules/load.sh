@@ -5,7 +5,7 @@ SCRIPTDIR=$(pwd)
 SCRIPTNAME="$(basename $0)"
 SCRIPTFULLNAME="${SCRIPTDIR}/${SCRIPTNAME}"
 
-[ -e rules.d ] && mkdir rules.d
+[ -e rules.d ] || mkdir rules.d
 for s in rules.d/*
 do
     source $s

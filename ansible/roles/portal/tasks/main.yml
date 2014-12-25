@@ -30,7 +30,17 @@
 
 - name: Setting up captive portal iptables rules
   template:
-    src=firewall_rules.j2
+    src="firewall/captive_portal.j2"
     dest="{{ iptables__rules_dir }}/captive_portal"
   notify:
     - reload iptables
+    
+- name: Creating captive portal data dir 
+  file:
+    path="{{ portal__basedir }}"
+    state="directory"
+    
+- name: Creating captive portal users list 
+  file:
+    path="{{ portal__users }}"
+    state="touch"

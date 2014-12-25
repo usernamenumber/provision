@@ -11,16 +11,22 @@
 
 
 case $1 in
-	start)
-		log_daemon_msg "Loading iptables rules" "iptables"
+	start | reload | restart)
+		logger -t iptables -p info "Clearing iptables rules" "iptables"
+		{{ iptables__clear_script }}
+		logger -t iptables -p info "Loading iptables rules" "iptables"
 		{{ iptables__load_script }}
 	;;
 	stop)
-		log_daemon_msg "Clearing iptables rules" "iptables"
+		logger -t iptables -p info "Clearing iptables rules" "iptables"
 		{{ iptables__clear_script }}
-	;;
-	reload | restart)
-                log_daemon_msg "Reloading iptables rules"
-		{{ iptables__load_script }}
+    ;;
+    status)
+        for t in nat filter mangle 
+        do
+            echo "## $t ##"
+            iptables -t $t -vnL --line
+            echo ""
+        done
 	;;
 esac

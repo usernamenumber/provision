@@ -1,4 +1,6 @@
 ---
 portal__enabled: true
 portal__web_root: ""
+portal__basedir: "{{ iptables__base_dir }}/captive_portal/"
+portal__users: "{{ portal__basedir }}/users"
 

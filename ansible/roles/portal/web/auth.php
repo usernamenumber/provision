@@ -13,15 +13,15 @@ $site_name = "x2go";
 $arp = "/usr/sbin/arp";
 
 // The following file is used to keep track of users
-$users = "/usr/local/tunapanda/data/wap/users";
+$users = "/usr/local/tunapanda/data/iptables/captive_portal//users";
 
 // Check if we've been redirected by firewall to here.
 // If so redirect to registration address
-if ($_SERVER['SERVER_NAME']!="$server_name.$domain_name") {
+/*if ($_SERVER['SERVER_NAME']!="$server_name.$domain_name") {
   header("location:http://$server_name.$domain_name/index.php?add="
     .urlencode($_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']));
   exit;
-}
+}*/
 
 // Attempt to get the client's mac address
 $mac = shell_exec("$arp -a ".$_SERVER['REMOTE_ADDR']);
@@ -43,6 +43,7 @@ if (!isset($_POST['email']) || !isset($_POST['name'])) {
   </form>
   <?php
 } else {
+    error_log("Registering...");
     enable_address();
 }
 
@@ -66,7 +67,7 @@ function enable_address() {
     exec("sudo rmtrack ".$_SERVER['REMOTE_ADDR']);
 
     sleep(1);
-    header("location:http://".$_GET['add']);
+    #header("location:http://".$_GET['add']);
     exit;
 }
 

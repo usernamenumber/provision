@@ -1,5 +1,5 @@
 ---
-#globalvar: GLOBAL
+globalvar: GLOBAL
 data_dir: "/usr/local/tunapanda"
 vagrant_share: "/vagrant"
 apache_dir: "/etc/apache2"
@@ -8,12 +8,29 @@ apache_user: "www-data"
 
 # Quick hack. These will be replaced with something
 # more flexible
-wired_ip: 192.168.2.3
-wired_netmask: 255.255.255.0
-wireless_ip: 10.2.2.1
-wireless_netmask: 255.255.255.0
+wired_ip: "{{ ansible_eth0.ipv4.address }}"
+wired_netmask: "{{ ansible_eth0.ipv4.netmask }}"
+wireless_ip: "{{ ansible_wlan1.ipv4.address }}"
+wireless_netmask: "{{ ansible_wlan1.ipv4.netmask }}"
 
 wap_interface: wlan1
 
 # You can override any of the variabes defined in 
 # roles/*/vars/main.yml here.
+apt_basic__enabled: false
+apt_localrepo__enabled: false
+bind__enabled: false
+build_iso__enabled: false
+common__enabled: false
+cubietruck__enabled: false
+desktop__enabled: false
+dhcpd__enabled: false
+edx__enabled: false
+external_data_drive__enabled: false
+iptables__enabled: false
+kalite__enabled: false
+php__enabled: false
+portal__enabled: true
+users__enabled: false
+wap__enabled: false
+wikipedia__enabled: false

@@ -1,4 +1,6 @@
 ---
 dependencies:
+  - { role: php }
+  - { role: bind }
   - { role: wap }
   - { role: iptables }
