@@ -1,36 +1,35 @@
 ## 
-## From http://www.andybev.com/index.php/Using_iptables_and_PHP_to_create_a_captive_portal
+## From http://www.andybev.com/index.php/Using_iptables_and_PHP_to_create_a_{{ portal__capture_chain }}_portal
 ## 
 
-# Create captive chain
+# Create {{ portal__capture_chain }} chain
 # This is used to authenticate users who have already signed up
-$IPTABLES -N captive -t mangle
+$IPTABLES -N {{ portal__capture_chain }} -t mangle
 
-# First send all traffic via newly created captive chain
+# First send all traffic via newly created {{ portal__capture_chain }} chain
 # At the prerouting NAT stage this will DNAT them to the local
 # webserver for them to signup if they aren't authorised
 # Packets for unauthorised users are marked for dropping later
-for i in {{ wap__data_wlan }}
+for i in {{ portal__lan.device }}
 do
-	echo "Skippping captive chain for $i"
-	#$IPTABLES -t mangle -A PREROUTING -i $i -j captive
+	echo "Skippping {{ portal__capture_chain }} chain for $i"
+	#$IPTABLES -t mangle -A PREROUTING -i $i -j {{ portal__capture_chain }}
 done
 
 ###### INTERNET CHAIN ##########
 # Allow authorised clients in, redirect all others to login webserver
 # Add known users to the NAT table to stop their dest being rewritten
 # Ignore MAC address with a * - these users are blocked
-# This awk script goes through the /var/lib/users flat file line by line
-awk 'BEGIN { FS="\t"; } { system("$IPTABLES -t mangle -A captive -m mac --mac-source "$4" -j RETURN"); }' {{ portal__users }}
+# This awk script goes through the {{ portal__users }} flat file line by line
+awk 'BEGIN { FS="\t"; } { system("$IPTABLES -t mangle -A {{ portal__capture_chain }} -m mac --mac-source "$4" -j RETURN"); }' {{ portal__users }}
 
 # MAC address not found. Mark the packet 99
-#$IPTABLES -t mangle -A captive -j LOG --log-prefix "SET MARK "
-$IPTABLES -t mangle -A captive -j MARK --set-mark 99
+#$IPTABLES -t mangle -A {{ portal__capture_chain }} -j LOG --log-prefix "SET MARK "
+$IPTABLES -t mangle -A {{ portal__capture_chain }} -j MARK --set-mark 99
 ################################
 
 # Redirects web requests from Unauthorised users to logon Web Page
-#$IPTABLES -t nat -A PREROUTING -i wlan1 -m mark --mark 99 -j LOG --log-prefix "REDIRECT MARKED "
-$IPTABLES -t nat -A PREROUTING -i wlan1 -m mark --mark 99 -j DNAT --to-destination {{ ansible_wlan1.ipv4.address }}
+$IPTABLES -t nat -A PREROUTING -i {{ portal__lan.device }} -m mark --mark 99 -j DNAT --to-destination {{ portal__redirect.ipv4.address }}
 
 # Allow localhost
 $IPTABLES -t filter -I INPUT -i lo -j ACCEPT
@@ -38,14 +37,12 @@ $IPTABLES -t filter -I INPUT -i lo -j ACCEPT
 # Now that we've got to the forward filter, drop all packets
 # marked 99 - these are unknown users. We can't drop them earlier
 # as there's no filter table
-#$IPTABLES -t filter -A FORWARD -i wlan1 -j LOG --log-prefix "FORWARD DROP MARKED "
-$IPTABLES -t filter -A FORWARD -i wlan1 -m mark --mark 99 -j DROP
+$IPTABLES -t filter -A FORWARD -i {{ portal__lan.device }} -m mark --mark 99 -j DROP
 
 # Do the same for the INPUT chain to stop people accessing the web through Squid
 $IPTABLES -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
 $IPTABLES -t filter -A INPUT -p tcp --dport 443 -j ACCEPT
 $IPTABLES -t filter -A INPUT -p udp --dport 53 -j ACCEPT
-#$IPTABLES -t filter -A INPUT -m mark --mark 99 -j LOG -i wlan1 --log-prefix "INPUT DROP MARKED "
 $IPTABLES -t filter -A INPUT -m mark --mark 99 -j DROP
 
 # Enable Internet connection sharing

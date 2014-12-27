@@ -2,3 +2,7 @@
 #- shell: "echo testvar in common: {{testvar}} >> /tmp/test"
 - shell: "echo globalvar in common: {{globalvar}} >> /tmp/test"
 #- shell: "echo cubievar in common: {{cubievar}} >> /tmp/test"
+- name: Installing basic packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - vim

@@ -1,6 +1,11 @@
 ---
 portal__enabled: true
-portal__web_root: ""
-portal__basedir: "{{ iptables__base_dir }}/captive_portal/"
-portal__users: "{{ portal__basedir }}/users"
+portal__docroot: "{{ apache_docroot }}/portal"
+portal__data: "{{ data_dir }}/data/captive_portal"
+portal__users: "{{ portal__data }}/users"
+portal__lan: "{{ ansible_wlan1 }}"
+portal__inet: "{{ ansible_eth0 }}"
+portal__redirect: "{{ ansible_eth0 }}" 
+portal__capture_chain: "captive"
+portal__title: "x2go - Education in a box"
 

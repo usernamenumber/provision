@@ -1,1 +1,15 @@
+---
 commonvar: "COMMON"
+data_dir: "/usr/local/tunapanda"
+vagrant_share: "/vagrant"
+apache_user: "www-data"
+apache_dir: "/etc/apache2"
+apache_docroot: "/var/www"
+apache_user: "www-data"
+
+
+wired_ip: "{{ ansible_eth0.ipv4.address }}"
+wired_netmask: "{{ ansible_eth0.ipv4.netmask }}"
+wireless_ip: "{{ ansible_wlan1.ipv4.address }}"
+wireless_netmask: "{{ ansible_wlan1.ipv4.netmask }}"
+wap_interface: wlan1

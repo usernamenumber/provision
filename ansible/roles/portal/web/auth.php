@@ -5,91 +5,78 @@
 *
 */
 
-$server_name = "127.0.0.1";
-$domain_name = "x2go.org";
-$site_name = "x2go";
+function print_auth_form() {
+?>
+	  <h3>Please Sign In (<?=$mac?>)</h3>
+	  <p>To access the Internet, please enter your details:</p>
+	  <form method='POST'>
+	  <table border=0 cellpadding=5 cellspacing=0>
+	  <tr><td>Your full name:</td><td><input type='text' name='name'></td></tr>
+	  <tr><td>Your email address:</td><td><input type='text' name='email'></td></tr>
+	  <tr><td></td><td><input type='submit' name='submit' value='Submit'></td></tr>
+	  </table>
+	  </form>
+<?php
+}
+
+function validate_auth_form() {
+	// TODO: Actual validation of some kind
+	return true;	
+}
 
 // Path to the arp command on the local server
 $arp = "/usr/sbin/arp";
 
 // The following file is used to keep track of users
-$users = "/usr/local/tunapanda/data/iptables/captive_portal//users";
+$users_fn = "/usr/local/tunapanda/data/captive_portal/users";
 
-// Check if we've been redirected by firewall to here.
-// If so redirect to registration address
-/*if ($_SERVER['SERVER_NAME']!="$server_name.$domain_name") {
-  header("location:http://$server_name.$domain_name/index.php?add="
-    .urlencode($_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']));
-  exit;
-}*/
-
-// Attempt to get the client's mac address
+// Attempt to get the client mac address
 $mac = shell_exec("$arp -a ".$_SERVER['REMOTE_ADDR']);
 preg_match('/..:..:..:..:..:../',$mac , $matches);
 @$mac = $matches[0];
-if (!isset($mac)) { exit; }
-
-if (!isset($_POST['email']) || !isset($_POST['name'])) {
-  // Name or email address not entered therefore display form
-  ?>
-  <h1>Welcome to <?php echo $site_name;?></h1>
-  To access the Internet you must first enter your details:<br><br>
-  <form method='POST'>
-  <table border=0 cellpadding=5 cellspacing=0>
-  <tr><td>Your full name:</td><td><input type='text' name='name'></td></tr>
-  <tr><td>Your email address:</td><td><input type='text' name='email'></td></tr>
-  <tr><td></td><td><input type='submit' name='submit' value='Submit'></td></tr>
-  </table>
-  </form>
-  <?php
-} else {
-    error_log("Registering...");
-    enable_address();
+if (!isset($mac)) { 
+	print "Cannot get MAC address, so cannot grant net access";
+	exit();
 }
-
-// This function enables the PC on the system by calling iptables, and also saving the
-// details in the users file for next time the firewall is reset
-
-function enable_address() {
-
-    global $name;
-    global $email;
-    global $mac;
-    global $users;
-
-    file_put_contents($users,$_POST['name']."\t".$_POST['email']."\t"
-        .$_SERVER['REMOTE_ADDR']."\t$mac\t".date("d.m.Y")."\n",FILE_APPEND + LOCK_EX);
     
-    // Add PC to the firewall
-    exec("sudo iptables -I internet 1 -t mangle -m mac --mac-source $mac -j RETURN");
-    // The following line removes connection tracking for the PC
-    // This clears any previous (incorrect) route info for the redirection
-    exec("sudo rmtrack ".$_SERVER['REMOTE_ADDR']);
-
-    sleep(1);
-    #header("location:http://".$_GET['add']);
-    exit;
+// Note whether this MAC is already in the users list. While doing
+// this we can also prepare a version of the file with an updated 
+// timestamp, but won't write it unless the form has been submitted
+$users = file($users);
+$users_updated = array();
+$already_recorded = false;
+$match_pattern = "/".preg_quote($mac)."/";
+foreach (file($users) as $line) {
+	if ( ! preg_match($match_pattern,$line) ) {
+		$users_updated[] = $line;
+	} else {
+		$already_recorded = true;
+	}
 }
+$users_updated[] = $_POST['name']."\t".$_POST['email']."\t"
+	.$_SERVER['REMOTE_ADDR']."\t$mac\t".date("d.m.Y");
 
-// Function to print page header
-function print_header() {
-
-  ?>
-  <html>
-  <head><title>Welcome to <?php echo $site_name;?></title>
-  <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-  <LINK rel="stylesheet" type="text/css" href="./style.css">
-  </head>
-
-  <body bgcolor=#FFFFFF text=000000>
-  <?php
-}
-
-// Function to print page footer
-function print_footer() {
-  echo "</body>";
-  echo "</html>";
-
-}
-
-?>
+// Main content
+if (isset($_POST['email']) || isset($_POST['name']))  {
+	if ( ! validate_auth_form() ) {
+		print "<div class='error'>ERROR: Bad auth information. Try again.</div>";
+		print_auth_form();
+	} else {
+		// Write updated file
+		file_put_contents($users,implode("\n",$users_updated)."\n",LOCK_EX);
+		
+		// Remove and re-add a rule to exempt this MAC from redirection
+		// (easier than searching for an existing chain before adding)
+		exec("sudo iptables -D captive -t mangle -m mac --mac-source $mac -j RETURN");
+		exec("sudo iptables -I captive 1 -t mangle -m mac --mac-source $mac -j RETURN");
+		
+		// The following line removes connection tracking for the PC
+		// This clears any previous (incorrect) route info for the redirection
+		exec("sudo rmtrack ".$_SERVER['REMOTE_ADDR']);
+		print ("Full access already granted");
+	}
+} else if ($already_recorded) {
+	print ("Full access granted");
+} else {
+	print_auth_form();
+} 
