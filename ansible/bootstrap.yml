@@ -1,17 +1,38 @@
 ---
 - hosts: all
   vars:
-    - bootstrap_script: /usr/local/tunapanda/provision/script/bootstrap.sh
+    provision_repo: "https://github.com/tunapanda/provision/"
+    provision_dir: "/usr/local/tunapanda/provision"
+    provision_ver: "master"
+    edx_repo: "https://github.com/tunapanda/edx/"
+    edx_dir: "/usr/local/tunapanda/edx"
+    edx_ver: "master"
   tasks:
-    - name: Adding bootstrapping script to rc.local
-      lineinfile:
-        dest="/etc/rc.local"
-        insertbefore='^exit'
-        regexp="bootstrap.sh"
-        line="{{ bootstrap_script }}"
+  - name: "install dependencies"
+    apt: 
+      name="{{ item }}"
+      state=installed
+    with_items:
+      - git
 
-    - name: Scheduling bootstrapping script
-      shell: echo {{ bootstrap_script }} | at now + 1 minute
+  - name: "provisioning repo"
+    git: 
+      repo="{{ provision_repo }}"
+      dest="{{ provision_dir }}"
+      version="{{ provision_ver }}"
+      update=true
 
+  - name: "edx repo"
+    git:
+      repo="{{ edx_repo }}"
+      dest="{{ edx_dir }}"
+      version="{{ edx_ver }}"
+      update=true
 
+  - name: "provision at boot"
+    lineinfile:
+      dest="/etc/rc.local"
+      state="present"
+      regexp="{{ provision_dir }}"
+      line="[ -x '{{ provision_dir }}/scripts/bootstrap.sh' ] && {{ provision_dir }}/scripts/bootstrap.sh"
 

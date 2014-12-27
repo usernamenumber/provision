@@ -7,6 +7,7 @@ PROVISION_VERSION="master"
 PROVISION_DIR="${BASE_DIR}/provision"
 INVENTORY="${PROVISION_DIR}/scripts/bootstrap_inventory.py"
 BOOTSTRAP_PLAYBOOK="${PROVISION_DIR}/ansible/bootstrap.yml"
+BOOTSTRAP_PLAYBOOK_URL="https://raw.githubusercontent.com/tunapanda/provision/master/ansible/bootstrap.yml"
 EDX_REPO="https://github.com/edx/configuration"
 EDX_VERSION="aspen.1"
 EDX_DIR="${BASE_DIR}/edx/configuration"
@@ -59,7 +60,7 @@ function get_url() {
 		curl -o - "$1" 
 	elif is_installed wget
 	then
-		wget -o - "$1"
+		wget -O - "$1"
 	elif is_installed elinks
 	then
 		elinks -dump "$1"
@@ -73,9 +74,16 @@ then
 	die 'Must be run as root!'
 fi
 
+if has_internet
+then
+	apt-get update
+fi
+
 if ! is_installed pip 
 then
 	has_internet || die "Pip is required, but we can't install it without a net connection"	
+	step "Installing pip dependencies"
+	apt-get install -y python-dev 
 	step "Getting pip"
 	get_url 'https://bootstrap.pypa.io/get-pip.py' | python
 	is_installed pip || die "Can't install pip. See: https://pip.pypa.io/en/latest/installing.html"
@@ -117,11 +125,13 @@ then
 	BOOTSTRAP_PLAYBOOK="/tmp/${RAND}bootstrap.yml"
 	BOOTSTRAP_INVENTORY="/tmp/${RAND}inventory.ini"
 	step "Provisioning repo not found. Downloading bootstrap playbook"
-	get_url ${PROVISION_REPO}/blob/${PROVISION_VERSION}/ansible/bootstrap.yml > $BOOSTRAP_PLAYBOOK
+	get_url $BOOTSTRAP_PLAYBOOK_URL > $BOOSTRAP_PLAYBOOK
 	cat > $BOOTSTRAP_INVENTORY <<EOF
 [localhost]
 127.0.0.1
 EOF
+else
+	BOOTSTRAP_INVENTORY=$INVENTORY
 fi
 
 export ANSIBLE_HOST_KEY_CHECKING=False
@@ -142,3 +152,4 @@ popd > /dev/null
 echo ""
 echo '*** ALL DONE! ***'
 echo ""
+
