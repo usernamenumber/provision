@@ -1,20 +1,15 @@
 #!/bin/bash -x
 
-(
 # Configs
-ATBOOT=false
-REPOURL=http://github.com/tunapanda/provision
-REPODIR=/usr/local/tunapanda/provision
-
-# Get the absolute path of this script
-cd `dirname $0` > /dev/null
-SCRIPTDIR=$(pwd)
-SCRIPTNAME="$(basename $0)"
-SCRIPTFULLNAME="${SCRIPTDIR}/${SCRIPTNAME}"
-
-# Base dir is assumed to be the parent of the git repo
-cd ..
-BASEDIR=$(pwd)
+BASE_DIR="/usr/local/tunapanda"
+PROVISION_REPO="http://github.com/tunapanda/provision"
+PROVISION_VERSION="master"
+PROVISION_DIR="${BASE_DIR}/provision"
+INVENTORY="${PROVISION_DIR}/scripts/bootstrap_inventory.py"
+BOOTSTRAP_PLAYBOOK="${PROVISION_DIR}/ansible/bootstrap.yml"
+EDX_REPO="https://github.com/edx/configuration"
+EDX_VERSION="aspen.1"
+EDX_DIR="${BASE_DIR}/edx/configuration"
 
 # Fatal errors
 function die() {
@@ -41,9 +36,9 @@ function has_internet() {
 	if [ -z "$HAS_INTERNET" ]
 	then
 		step "Checking internet access" 
-        if [ -f $SCRIPTDIR/has_internet ] 
+        if [ -f $PROVISION_DIR/scripts/has_internet ] 
         then
-            $SCRIPTDIR/has_internet
+            $PROVISION_DIR/scripts/has_internet
         else
 		    ping -c1 -t5 www.google.com #&> /dev/null
         fi
@@ -58,74 +53,33 @@ function is_installed() {
 	return $?
 }
 
+function get_url() {
+	if is_installed curl
+	then
+		curl -o - "$1" 
+	elif is_installed wget
+	then
+		wget -o - "$1"
+	elif is_installed elinks
+	then
+		elinks -dump "$1"
+	else
+		die "Cannot retrieve urls. Please install curl, wget, or elinks"
+	fi
+}
+
 if [ $EUID -ne 0 ]
 then
 	die 'Must be run as root!'
 fi
 
-if [ ! -e "$REPODIR" ]
-then
-    has_internet || die "No provisioning repo and no net connection. Cannot proceed."
-    step "Cloning provisioning repo"
-    git clone --recursive $REPOURL $REPODIR
-fi
-
-if ! has_internet
-then 
-    note "No Internet connection. Skipping update of provisioning data"
-else
-    step "Updating provisioning data"
-    pushd $REPODIR > /dev/null
-    git pull
-    popd > /dev/null
-fi
-
-if $ATBOOT && ! grep $SCRIPTFULLNAME /etc/rc.local &>/dev/null 
-then
-	step "Setting the script to run at boot time"
-	# This gets messy because Debian Wheezy's rc.local
-	# has an explicit call to 'exit 0' at the end, so
-	# we can't just append in that case
-	( 
-		if tail -n1 /etc/rc.local | grep '^exit 0'
-		then
-			head -n -1 /etc/rc.local
-			echo ""
-			echo "[ -f $SCRIPTFULLNAME ] && $SCRIPTFULLNAME" 
-			echo "exit 0"
-		else 
-			cat /etc/rc.local
-			echo ""
-			echo "[ -f $SCRIPTFULLNAME ] && $SCRIPTFULLNAME"  
-		fi
-	)  > /etc/rc.local
-fi
-
-#if dpkg -l language-pack-en-base &> /dev/null
-#then
-#	step "Installing missing language pack"
-#	has_internet && apt-get install -y --force-yes language-pack-en-base
-#fi
-
-
 if ! is_installed pip 
 then
 	has_internet || die "Pip is required, but we can't install it without a net connection"	
 	step "Getting pip"
-	if is_installed curl
-	then
-		curl -o - 'https://bootstrap.pypa.io/get-pip.py' | python
-	elif is_installed wget
-	then
-		wget -o - 'https://bootstrap.pypa.io/get-pip.py' | python
-	elif is_installed elinks
-	then
-		elinks -dump 'https://bootstrap.pypa.io/get-pip.py' | python
-	fi
-
+	get_url 'https://bootstrap.pypa.io/get-pip.py' | python
 	is_installed pip || die "Can't install pip. See: https://pip.pypa.io/en/latest/installing.html"
 fi
-
 
 if ! is_installed ansible 
 then
@@ -136,12 +90,6 @@ then
 	is_installed ansible || die "Something went wrong installing ansible. Cannot continue."
 fi
 
-if has_internet
-then
-	step "Getting required ansible roles"
-#	ansible-galaxy install debops.dhcpd
-fi
-	
 if [ ! -f /root/.ssh/provisioning ]
 then
 	step "Generating SSH keys for provisioning"
@@ -161,12 +109,36 @@ ssh-add /root/.ssh/provisioning
 ssh-add -l
 ssh -i /root/.ssh/provisioning -o StrictHostKeyChecking=no localhost echo 'User key works, host key added!'
 
-step "Running Ansible"
-pwd
+# Can't find repo. Probably a fresh install, so download the bootstrap playbook
+if [ ! -e "$BOOTSTRAP_PLAYBOOK" ]
+then
+	has_internet || die "Can't find repo, but no net access, so can't retrieve it either"
+	RAND=$RANDOM
+	BOOTSTRAP_PLAYBOOK="/tmp/${RAND}bootstrap.yml"
+	BOOTSTRAP_INVENTORY="/tmp/${RAND}inventory.ini"
+	step "Provisioning repo not found. Downloading bootstrap playbook"
+	get_url ${PROVISION_REPO}/blob/${PROVISION_VERSION}/ansible/bootstrap.yml > $BOOSTRAP_PLAYBOOK
+	cat > $BOOTSTRAP_INVENTORY <<EOF
+[localhost]
+127.0.0.1
+EOF
+fi
+
 export ANSIBLE_HOST_KEY_CHECKING=False
-ansible-playbook -vvv -i $REPODIR/scripts/bootstrap_inventory.py $REPODIR/ansible/main.yml
+# Clone/update the other repos
+step "Running bootstrap playbook"
+ansible-playbook -vvvv -i $BOOTSTRAP_INVENTORY $BOOTSTRAP_PLAYBOOK | die "Could not retrieve provisioning repos"
+
+step "Running edX playbook"
+pushd ${EDX_DIR}/playbooks/ > /dev/null
+ansible-playbook -vvv -i $REPODIR/scripts/bootstrap_inventory.py edx_sandbox.yml
+popd > /dev/null
+
+step "Running core playbook"
+pushd ${PROVISION_DIR}/ansible/ > /dev/null
+#ansible-playbook -vvv -i $REPODIR/scripts/bootstrap_inventory.py $REPODIR/ansible/main.yml
+popd > /dev/null
 
 echo ""
 echo '*** ALL DONE! ***'
 echo ""
-) | tee /var/log/bootstrap.log
