@@ -3,7 +3,7 @@
 # Configs
 BASE_DIR="/usr/local/tunapanda"
 PROVISION_REPO="http://github.com/tunapanda/provision"
-PROVISION_VERSION="master"
+PROVISION_VERSION="bootstrap"
 PROVISION_DIR="${BASE_DIR}/provision"
 INVENTORY="${PROVISION_DIR}/scripts/bootstrap_inventory.py"
 BOOTSTRAP_PLAYBOOK="${PROVISION_DIR}/ansible/bootstrap.yml"
