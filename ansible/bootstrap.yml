@@ -3,8 +3,8 @@
   vars:
     provision_repo: "https://github.com/tunapanda/provision/"
     provision_dir: "/usr/local/tunapanda/provision"
-    provision_ver: "master"
-    edx_repo: "https://github.com/tunapanda/edx/"
+    provision_ver: "boostrap2"
+    edx_repo: "https://github.com/tunapanda/configuration/"
     edx_dir: "/usr/local/tunapanda/edx"
     edx_ver: "master"
   tasks:
