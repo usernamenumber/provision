@@ -22,7 +22,7 @@
 - name: Creating Apache config
   template:
       src="httpd-wikipedia.j2"
-      dest={{ apache_dir }}/sites-available/tunapanda-wikipedia
+      dest="{{ apache_dir }}/sites-available/tunapanda-wikipedia"
 
 - name: Linking Apache config
   file: 
@@ -31,6 +31,17 @@
     state: link
   notify:
     - restart apache
+
+- name: Creating document root
+  file:
+    path: "{{ wikipedia__data_dir }}"
+    state: "directory"
+    owner: "{{ apache_user }}"
+
+- name: Creating 404 page
+  template:
+    src="notfound.html.j2"
+    dest="{{ wikipedia__data_dir }}/notfound.html"
 
 - name: Linking Apache document root
   file: 
