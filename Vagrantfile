@@ -10,12 +10,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   config.vm.box = "hashicorp/precise64"
-  #config.vm.provision "shell", path: "script.sh"
-  config.vm.provision "ansible" do |ansible|
-    ansible.verbose = "vvvv"
-    ansible.playbook = "ansible/main.yml"
-    ansible.sudo = true
-  end
+  config.vm.synced_folder ".", "/usr/local/tunapanda/provision"
+  config.vm.provision "shell", path: "/usr/local/tunapanda/provision/scripts/bootstrap.sh"
+#  config.vm.provision "ansible" do |ansible|
+#    ansible.verbose = "vvvv"
+#    ansible.playbook = "ansible/main.yml"
+#    ansible.sudo = true
+#  end
   config.vm.provider "virtualbox" do |vb|
     vb.gui = true
   end

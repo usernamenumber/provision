@@ -27,9 +27,14 @@ def config_cubietruck():
     groups.append("cubietruck")
     groups.append("wap")
 
+# TODO: make this more flexible (roles, not just groups)?
+config_file="../force_groups"
+if os.path.exists(config_file):
+    disable_all_roles()
+    groups = [ x.strip() for x in open(config_file,"r").readlines() ]
 # Naively assume that any ARM machine
 # counts as a Cubietruck for provisioning
-if "arm" in platform.machine():
+elif "arm" in platform.machine():
     config_cubietruck()
 
 args = parser.parse_args()
