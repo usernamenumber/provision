@@ -9,3 +9,4 @@ data/provisioning.txt
 data/packages/*
 !data/packages/README.md
 /.idea
+force_groups
