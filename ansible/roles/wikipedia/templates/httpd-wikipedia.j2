@@ -6,7 +6,9 @@
 	RewriteEngine on
 	RewriteRule ^/wiki(.)(.*)$ /wp/$1/$1$2.htm [PT]
 	CheckSpelling on
+	Options -Indexes
+	DirectoryIndex index.php index.html /notfound.html
 	ErrorDocument 404 /notfound.html
-
 	DocumentRoot {{ wikipedia__data_dir }}
 </VirtualHost>
+
