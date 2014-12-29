@@ -1,0 +1,3 @@
+[submodule "ansible/roles/debops_ifupdown"]
+	path = ansible/roles/debops_ifupdown
+	url = https://github.com/debops/ansible-ifupdown

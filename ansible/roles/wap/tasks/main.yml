@@ -9,6 +9,7 @@
 
 - name: "Load wlan driver"
   command: modprobe bcmdhd
+  ignore_errors: yes
 
 # Install the package "hostapd"
 - apt: name=hostapd state=present
