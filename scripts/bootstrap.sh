@@ -1,17 +1,30 @@
 #!/bin/bash -x
 
 # Configs
+# All of these can be overridden by setting them as environment vars
+PROVISION_BASE_DIR=${PROVISION_BASE_DIR:-"/usr/local/tunapanda"}
 ## TODO: Change usernamenumber URLs back to tunapanda
-BASE_DIR="/usr/local/tunapanda"
-PROVISION_REPO="http://github.com/usernamenumber/provision"
-PROVISION_VERSION="cubie"
-PROVISION_DIR="${BASE_DIR}/provision"
-INVENTORY="${PROVISION_DIR}/scripts/inventory.py"
-BOOTSTRAP_PLAYBOOK="${PROVISION_DIR}/ansible/bootstrap.yml"
-BOOTSTRAP_PLAYBOOK_URL="https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_VERSION}/ansible/bootstrap.yml"
-EDX_REPO="https://github.com/edx/configuration"
-EDX_VERSION="aspen.1"
-EDX_DIR="${BASE_DIR}/edx/configuration"
+PROVISION_CORE_REPO=${PROVISION_CORE_REPO:-"http://github.com/usernamenumber/provision"}
+PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
+PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"ansible/main.yml"}
+PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
+if [ -z "$PROVISION_CORE_VERSION" ]
+then
+    # If the repo has been checked out, use the current branch
+    if [ -d ${PROVISION_CORE_DIR}/.git ]
+    then
+        pushd $PROVISION_CORE_DIR > /dev/null
+        PROVISION_CORE_VERSION=$(basename $(git symbolic-ref HEAD))
+        popd > /dev/null
+    else
+        PROVISION_CORE_VERSION="master"
+    fi
+fi
+PROVISION_EDX_REPO=${PROVISION_EDX_REPO:="https://github.com/edx/configuration"}
+PROVISION_EDX_VERSION=${PROVISION_EDX_VERSION:-"aspen.1"}
+PROVISION_EDX_DIR=${PROVISION_EDX_DIR:-"${PROVISION_BASE_DIR}/edx/configuration"}
+PROVISION_EDX_PLAYBOOK=${PROVISION_EDX_PLAYBOOK:-"playbooks/edx_sandbox.yml"}
+PROVISION_EDX_INVENTORY=${PROVISION_EDX_INVENTORY:-$PROVISION_CORE_INVENTORY}
 
 # Fatal errors
 function die() {
@@ -38,9 +51,9 @@ function has_internet() {
 	if [ -z "$HAS_INTERNET" ]
 	then
 		step "Checking internet access" 
-        if [ -f $PROVISION_DIR/scripts/has_internet ] 
+        if [ -f $PROVISION_CORE_DIR/scripts/has_internet ] 
         then
-            $PROVISION_DIR/scripts/has_internet
+            $PROVISION_CORE_DIR/scripts/has_internet
         else
 		    ping -c1 -w5 www.google.com #&> /dev/null
         fi
@@ -128,41 +141,43 @@ ssh-add /root/.ssh/provisioning
 ssh-add -l
 ssh -i /root/.ssh/provisioning -o StrictHostKeyChecking=no localhost echo 'User key works, host key added!'
 
+PROVISION_BOOTSTRAP_PLAYBOOK="${PROVISION_CORE_DIR}/ansible/bootstrap.yml"
+PROVISION_BOOTSTRAP_PLAYBOOK_URL="https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_CORE_VERSION}/ansible/bootstrap.yml"
 # Can't find repo. Probably a fresh install, so download the bootstrap playbook
-if [ ! -e "$BOOTSTRAP_PLAYBOOK" ]
+if [ ! -e "$PROVISION_BOOTSTRAP_PLAYBOOK" ]
 then
 	has_internet || die "Can't find repo, but no net access, so can't retrieve it either"
 	RAND=$RANDOM
-	BOOTSTRAP_DIR="/tmp/"
-	BOOTSTRAP_PLAYBOOK="${RAND}bootstrap.yml"
-	BOOTSTRAP_INVENTORY="${RAND}inventory.ini"
+	PROVISION_BOOTSTRAP_DIR="/tmp/"
+	PROVISION_BOOTSTRAP_PLAYBOOK="${RAND}bootstrap.yml"
+	PROVISION_BOOTSTRAP_INVENTORY="${RAND}inventory.ini"
 	step "Provisioning repo not found. Downloading bootstrap playbook"
-	get_url $BOOTSTRAP_PLAYBOOK_URL > $BOOTSTRAP_DIR/$BOOTSTRAP_PLAYBOOK
-	cat > $BOOTSTRAP_DIR/$BOOTSTRAP_INVENTORY <<EOF
+	get_url $PROVISION_BOOTSTRAP_PLAYBOOK_URL > $PROVISION_BOOTSTRAP_DIR/$PROVISION_BOOTSTRAP_PLAYBOOK
+	cat > $PROVISION_BOOTSTRAP_DIR/$PROVISION_BOOTSTRAP_INVENTORY <<EOF
 [localhost]
 127.0.0.1
 EOF
 else
-	BOOTSTRAP_DIR="${PROVISION_DIR}/ansible"
-	BOOTSTRAP_PLAYBOOK="bootstrap.yml"
-	BOOTSTRAP_INVENTORY=$INVENTORY
+	PROVISION_BOOTSTRAP_DIR="${PROVISION_CORE_DIR}/ansible"
+	PROVISION_BOOTSTRAP_PLAYBOOK="bootstrap.yml"
+	PROVISION_BOOTSTRAP_INVENTORY=$INVENTORY
 fi
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 # Clone/update the other repos
 step "Running bootstrap playbook"
-pushd ${BOOTSTRAP_DIR} > /dev/null
-ansible-playbook -vvvv -i $BOOTSTRAP_INVENTORY $BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
+pushd ${PROVISION_BOOTSTRAP_DIR} > /dev/null
+ansible-playbook -vvvv -i $PROVISION_BOOTSTRAP_INVENTORY $PROVISION_BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
 popd > /dev/null
 
 step "Running edX playbook"
-pushd ${EDX_DIR}/playbooks/ > /dev/null
-#ansible-playbook -vvv -i $EDX_DIR/scripts/bootstrap_inventory.py edx_sandbox.yml || die "Could not run edx playbook"
+pushd ${PROVISION_EDX_DIR}/playbooks/ > /dev/null
+#ansible-playbook -vvv -i $PROVISION_EDX_INVENTORY $PROVISION_EDX_PLAYBOOK || die "Could not run edx playbook"
 popd > /dev/null
 
 step "Running core playbook"
-pushd ${PROVISION_DIR}/ansible/ > /dev/null
-ansible-playbook -vvv -i $PROVISION_DIR/scripts/bootstrap_inventory.py main.yml || die "Could not run core playbook"
+pushd ${PROVISION_CORE_DIR} > /dev/null
+ansible-playbook -vvv -i $PROVISION_INVENTORY $PROVISION_CORE_PLAYBOOK || die "Could not run core playbook"
 popd > /dev/null
 
 echo ""

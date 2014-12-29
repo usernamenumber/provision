@@ -14,7 +14,6 @@
     - { role: wap, when: wap__enabled }
     - { role: kalite, when: kalite__enabled }
     - { role: wikipedia, when: wikipedia__enabled }
-    - { role: portal, when: portal__enabled }
     # Always run this one last, since it will build the ISO
     - { role: build_iso, when: build_iso__enabled }
   handlers:
@@ -34,4 +33,9 @@
     - config.wap.yml
   roles:
     - { role: wap }
+
+- hosts: portal
+  vars_files:
+    - config.yml
+  roles:
     - { role: portal }

@@ -4,9 +4,9 @@ dependencies:
   ifupdown_external_interface: 'eth0'
   ifupdown_internal_interface: 'wlan0'
   ifupdown_interfaces: 
-    - iface: 'eth0'
+    - iface: "{{ ifupdown_external_interface }}"
       inet: 'dhcp'
-    - iface: 'wlan0'
+    - iface: "{{ ifupdown_internal_interface }}"
       inet: 'static'
       options: | 
         address "10.0.0.1"
