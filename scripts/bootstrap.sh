@@ -9,11 +9,11 @@ PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
 PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"ansible/main.yml"}
 PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
 PROVISION_CORE_VERSION="" # default to current branch or master if no repo
-PROVISION_EDX_REPO=${PROVISION_EDX_REPO:="https://github.com/edx/configuration"}
-PROVISION_EDX_VERSION=${PROVISION_EDX_VERSION:-"aspen.1"}
-PROVISION_EDX_DIR=${PROVISION_EDX_DIR:-"${PROVISION_BASE_DIR}/edx/configuration"}
-PROVISION_EDX_PLAYBOOK=${PROVISION_EDX_PLAYBOOK:-"playbooks/edx_sandbox.yml"}
-PROVISION_EDX_INVENTORY=${PROVISION_EDX_INVENTORY:-$PROVISION_CORE_INVENTORY}
+#PROVISION_EDX_REPO=${PROVISION_EDX_REPO:="https://github.com/edx/configuration"}
+#PROVISION_EDX_VERSION=${PROVISION_EDX_VERSION:-"aspen.1"}
+#PROVISION_EDX_DIR=${PROVISION_EDX_DIR:-"${PROVISION_BASE_DIR}/edx/configuration"}
+#PROVISION_EDX_PLAYBOOK=${PROVISION_EDX_PLAYBOOK:-"playbooks/edx_sandbox.yml"}
+#PROVISION_EDX_INVENTORY=${PROVISION_EDX_INVENTORY:-$PROVISION_CORE_INVENTORY}
 
 # Fatal errors
 function die() {
@@ -174,21 +174,30 @@ host_key_checking=False
 EOF
 fi
 
-export ANSIBLE_HOST_KEY_CHECKING=False
+#export ANSIBLE_HOST_KEY_CHECKING=False
+# Cheap way to ensure that github's host key is known. Otherwise, even with the setting above,
+# ansible may stall if it tries to update a repo with an ssh url
+ssh -o StrictHostKeyChecking=no git@github.com 'true' &> /dev/null
+
 # Clone/update the other repos
 step "Running bootstrap playbook"
 pushd ${PROVISION_BOOTSTRAP_DIR} > /dev/null
-ansible-playbook -vvvv -i $PROVISION_BOOTSTRAP_INVENTORY $PROVISION_BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
+ansible-playbook -vvvv \
+    -i $PROVISION_BOOTSTRAP_INVENTORY \
+    -e "provision_ver=$PROVISION_CORE_VERSION provision_repo=$PROVISION_CORE_REPO provision_dir=$PROVISION_CORE_DIR" \
+    $PROVISION_BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
 popd > /dev/null
 
-step "Running edX playbook"
-pushd ${PROVISION_EDX_DIR}/playbooks/ > /dev/null
+#step "Running edX playbook"
+#pushd ${PROVISION_EDX_DIR}/playbooks/ > /dev/null
 #ansible-playbook -vvv -i $PROVISION_EDX_INVENTORY $PROVISION_EDX_PLAYBOOK || die "Could not run edx playbook"
-popd > /dev/null
+#popd > /dev/null
 
 step "Running core playbook"
 pushd ${PROVISION_CORE_DIR} > /dev/null
-ansible-playbook -vvv -i $PROVISION_INVENTORY $PROVISION_CORE_PLAYBOOK || die "Could not run core playbook"
+ansible-playbook -vvv \
+    -i $PROVISION_INVENTORY \
+    $PROVISION_CORE_PLAYBOOK || die "Could not run core playbook"
 popd > /dev/null
 
 echo ""
