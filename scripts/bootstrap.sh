@@ -141,8 +141,9 @@ ssh-add /root/.ssh/provisioning
 ssh-add -l
 ssh -i /root/.ssh/provisioning -o StrictHostKeyChecking=no localhost echo 'User key works, host key added!'
 
-PROVISION_BOOTSTRAP_PLAYBOOK="${PROVISION_CORE_DIR}/ansible/bootstrap.yml"
-PROVISION_BOOTSTRAP_PLAYBOOK_URL="https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_CORE_VERSION}/ansible/bootstrap.yml"
+PROVISION_BOOTSTRAP_DIR="${PROVISION_BOOTSTRAP_DIR:-$PROVISION_CORE_DIR}"
+PROVISION_BOOTSTRAP_PLAYBOOK="${PROVISION_BOOTSTRAP_PLAYBOOK:=ansible/bootstrap.yml}"
+PROVISION_BOOTSTRAP_PLAYBOOK_URL="${PROVISION_BOOTSTRAP_PLAYBOOK_URL:-https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_CORE_VERSION}/ansible/bootstrap.yml}"
 # Can't find repo. Probably a fresh install, so download the bootstrap playbook
 if [ ! -e "$PROVISION_BOOTSTRAP_PLAYBOOK" ]
 then
@@ -158,7 +159,6 @@ then
 127.0.0.1
 EOF
 else
-	PROVISION_BOOTSTRAP_DIR="${PROVISION_CORE_DIR}/ansible"
 	PROVISION_BOOTSTRAP_PLAYBOOK="bootstrap.yml"
 	PROVISION_BOOTSTRAP_INVENTORY=$INVENTORY
 fi
