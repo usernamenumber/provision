@@ -1,13 +1,14 @@
 #!/bin/bash -x
 
 # Configs
+## TODO: Change usernamenumber URLs back to tunapanda
 BASE_DIR="/usr/local/tunapanda"
-PROVISION_REPO="http://github.com/tunapanda/provision"
+PROVISION_REPO="http://github.com/usernamenumber/provision"
 PROVISION_VERSION="bootstrap"
 PROVISION_DIR="${BASE_DIR}/provision"
 INVENTORY="${PROVISION_DIR}/scripts/bootstrap_inventory.py"
 BOOTSTRAP_PLAYBOOK="${PROVISION_DIR}/ansible/bootstrap.yml"
-BOOTSTRAP_PLAYBOOK_URL="https://raw.githubusercontent.com/tunapanda/provision/master/ansible/bootstrap.yml"
+BOOTSTRAP_PLAYBOOK_URL="https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_VERSION}/ansible/bootstrap.yml"
 EDX_REPO="https://github.com/edx/configuration"
 EDX_VERSION="aspen.1"
 EDX_DIR="${BASE_DIR}/edx/configuration"
@@ -41,7 +42,7 @@ function has_internet() {
         then
             $PROVISION_DIR/scripts/has_internet
         else
-		    ping -c1 -t5 www.google.com #&> /dev/null
+		    ping -c1 -w5 www.google.com #&> /dev/null
         fi
 		HAS_INTERNET=$?
 	fi
@@ -74,8 +75,10 @@ then
 	die 'Must be run as root!'
 fi
 
-if has_internet
+# Update packages if the haven't been updated in the last 12 hours
+if has_internet && [ $[ $(date +%s) - $(date -r /var/lib/apt/lists/ +%s) ] -gt $[ 60 * 60 * 12 ] ] 
 then
+	step "Updating package list"
 	apt-get update
 fi
 
@@ -87,6 +90,14 @@ then
 	step "Getting pip"
 	get_url 'https://bootstrap.pypa.io/get-pip.py' | python
 	is_installed pip || die "Can't install pip. See: https://pip.pypa.io/en/latest/installing.html"
+fi
+
+if ! is_installed sshd 
+then
+	step "Installing ssh server"
+	has_internet || die "An ssh server is required, but we can't install it without a net connection"	
+	apt-get install -y openssh-server 
+	is_installed sshd || die "Something when wrong installing the ssh server. Cannot continue."
 fi
 
 if ! is_installed ansible 
@@ -125,7 +136,7 @@ then
 	BOOTSTRAP_PLAYBOOK="/tmp/${RAND}bootstrap.yml"
 	BOOTSTRAP_INVENTORY="/tmp/${RAND}inventory.ini"
 	step "Provisioning repo not found. Downloading bootstrap playbook"
-	get_url $BOOTSTRAP_PLAYBOOK_URL > $BOOSTRAP_PLAYBOOK
+	get_url $BOOTSTRAP_PLAYBOOK_URL > $BOOTSTRAP_PLAYBOOK
 	cat > $BOOTSTRAP_INVENTORY <<EOF
 [localhost]
 127.0.0.1
@@ -137,16 +148,16 @@ fi
 export ANSIBLE_HOST_KEY_CHECKING=False
 # Clone/update the other repos
 step "Running bootstrap playbook"
-ansible-playbook -vvvv -i $BOOTSTRAP_INVENTORY $BOOTSTRAP_PLAYBOOK | die "Could not retrieve provisioning repos"
+ansible-playbook -vvvv -i $BOOTSTRAP_INVENTORY $BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
 
 step "Running edX playbook"
 pushd ${EDX_DIR}/playbooks/ > /dev/null
-ansible-playbook -vvv -i $REPODIR/scripts/bootstrap_inventory.py edx_sandbox.yml
+#ansible-playbook -vvv -i $REPODIR/scripts/bootstrap_inventory.py edx_sandbox.yml || die "Could not run edx playbook"
 popd > /dev/null
 
 step "Running core playbook"
 pushd ${PROVISION_DIR}/ansible/ > /dev/null
-#ansible-playbook -vvv -i $REPODIR/scripts/bootstrap_inventory.py $REPODIR/ansible/main.yml
+ansible-playbook -vvv -i $REPODIR/scripts/bootstrap_inventory.py $REPODIR/ansible/main.yml || die "Could not run core playbook"
 popd > /dev/null
 
 echo ""
