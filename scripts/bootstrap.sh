@@ -137,8 +137,8 @@ then
 	BOOTSTRAP_PLAYBOOK="${RAND}bootstrap.yml"
 	BOOTSTRAP_INVENTORY="${RAND}inventory.ini"
 	step "Provisioning repo not found. Downloading bootstrap playbook"
-	get_url $BOOTSTRAP_PLAYBOOK_URL > $BOOTSTRAP_DIR/$BOOTSTRAP_PLAYBOOK
-	cat > $BOOTSTRAP_DIR/$BOOTSTRAP_INVENTORY <<EOF
+	get_url $BOOTSTRAP_PLAYBOOK_URL > $BOOTSTRAP_PLAYBOOK
+	cat > $BOOTSTRAP_INVENTORY <<EOF
 [localhost]
 127.0.0.1
 EOF
