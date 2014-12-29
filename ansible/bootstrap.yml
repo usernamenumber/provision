@@ -15,6 +15,12 @@
     with_items:
       - git
 
+    # Cheap way to ensure that github's host key is known. Otherwise ansible may stall if it tries to
+    # update a repo with an ssh url
+  - name: Store github host key
+    command: ssh -o StrictHostKeyChecking=no git@github.com 'true'
+    ignore_errors: yes
+
   - name: "provisioning repo"
     git: 
       repo="{{ provision_repo }}"
@@ -22,7 +28,6 @@
       version="{{ provision_ver }}"
       update=yes
       recursive=yes
-      accept_hostkey=yes
 
   - name: "edx repo"
     git:
@@ -31,7 +36,6 @@
       version="{{ edx_ver }}"
       update=yes
       recursive=yes
-      accept_hostkey=yes
 
   - name: "provision at boot"
     lineinfile:
