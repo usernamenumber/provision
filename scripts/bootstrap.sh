@@ -105,7 +105,7 @@ then
 	step "Installing Ansible"
 	has_internet || die "Ansible is required, but we can't install it without a net connection"	
 	apt-get install -y python-dev
-	pip install ansible
+	pip install --upgrade 'ansible>=1.6'
 	is_installed ansible || die "Something went wrong installing ansible. Cannot continue."
 fi
 
@@ -133,8 +133,9 @@ if [ ! -e "$BOOTSTRAP_PLAYBOOK" ]
 then
 	has_internet || die "Can't find repo, but no net access, so can't retrieve it either"
 	RAND=$RANDOM
-	BOOTSTRAP_PLAYBOOK="/tmp/${RAND}bootstrap.yml"
-	BOOTSTRAP_INVENTORY="/tmp/${RAND}inventory.ini"
+	BOOTSTRAP_DIR="/tmp/${RAND}"
+	BOOTSTRAP_PLAYBOOK="bootstrap.yml"
+	BOOTSTRAP_INVENTORY="inventory.ini"
 	step "Provisioning repo not found. Downloading bootstrap playbook"
 	get_url $BOOTSTRAP_PLAYBOOK_URL > $BOOTSTRAP_PLAYBOOK
 	cat > $BOOTSTRAP_INVENTORY <<EOF
@@ -142,22 +143,26 @@ then
 127.0.0.1
 EOF
 else
+	BOOTSTRAP_DIR="${PROVISION_DIR}/ansible"
+	BOOTSTRAP_PLAYBOOK="bootstrap.yml"
 	BOOTSTRAP_INVENTORY=$INVENTORY
 fi
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 # Clone/update the other repos
 step "Running bootstrap playbook"
+pushd ${BOOTSTRAP_DIR} > /dev/null
 ansible-playbook -vvvv -i $BOOTSTRAP_INVENTORY $BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
+popd > /dev/null
 
 step "Running edX playbook"
 pushd ${EDX_DIR}/playbooks/ > /dev/null
-#ansible-playbook -vvv -i $REPODIR/scripts/bootstrap_inventory.py edx_sandbox.yml || die "Could not run edx playbook"
+#ansible-playbook -vvv -i $EDX_DIR/scripts/bootstrap_inventory.py edx_sandbox.yml || die "Could not run edx playbook"
 popd > /dev/null
 
 step "Running core playbook"
 pushd ${PROVISION_DIR}/ansible/ > /dev/null
-ansible-playbook -vvv -i $REPODIR/scripts/bootstrap_inventory.py $REPODIR/ansible/main.yml || die "Could not run core playbook"
+ansible-playbook -vvv -i $PROVISION_DIR/scripts/bootstrap_inventory.py main.yml || die "Could not run core playbook"
 popd > /dev/null
 
 echo ""
