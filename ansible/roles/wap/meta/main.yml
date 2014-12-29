@@ -1,0 +1,14 @@
+---
+dependencies:
+- role: debops.ifupdown
+  ifupdown_external_interface: 'eth0'
+  ifupdown_internal_interface: 'wlan0'
+  ifupdown_interfaces: 
+    - iface: 'eth0'
+      inet: 'dhcp'
+    - iface: 'wlan0'
+      inet: 'static'
+      options: | 
+        address "10.0.0.1"
+        netmask "255.0.0.0"
+- { role: dhcpd }
