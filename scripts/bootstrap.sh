@@ -6,7 +6,7 @@ BASE_DIR="/usr/local/tunapanda"
 PROVISION_REPO="http://github.com/usernamenumber/provision"
 PROVISION_VERSION="bootstrap"
 PROVISION_DIR="${BASE_DIR}/provision"
-INVENTORY="${PROVISION_DIR}/scripts/bootstrap_inventory.py"
+INVENTORY="${PROVISION_DIR}/scripts/inventory.py"
 BOOTSTRAP_PLAYBOOK="${PROVISION_DIR}/ansible/bootstrap.yml"
 BOOTSTRAP_PLAYBOOK_URL="https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_VERSION}/ansible/bootstrap.yml"
 EDX_REPO="https://github.com/edx/configuration"
@@ -133,9 +133,9 @@ if [ ! -e "$BOOTSTRAP_PLAYBOOK" ]
 then
 	has_internet || die "Can't find repo, but no net access, so can't retrieve it either"
 	RAND=$RANDOM
-	BOOTSTRAP_DIR="/tmp/${RAND}"
-	BOOTSTRAP_PLAYBOOK="bootstrap.yml"
-	BOOTSTRAP_INVENTORY="inventory.ini"
+	BOOTSTRAP_DIR="/tmp/"
+	BOOTSTRAP_PLAYBOOK="${RAND}bootstrap.yml"
+	BOOTSTRAP_INVENTORY="${RAND}inventory.ini"
 	step "Provisioning repo not found. Downloading bootstrap playbook"
 	get_url $BOOTSTRAP_PLAYBOOK_URL > $BOOTSTRAP_PLAYBOOK
 	cat > $BOOTSTRAP_INVENTORY <<EOF
