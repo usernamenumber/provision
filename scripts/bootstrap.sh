@@ -8,18 +8,7 @@ PROVISION_CORE_REPO=${PROVISION_CORE_REPO:-"http://github.com/usernamenumber/pro
 PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
 PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"ansible/main.yml"}
 PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
-if [ -z "$PROVISION_CORE_VERSION" ]
-then
-    # If the repo has been checked out, use the current branch
-    if [ -d ${PROVISION_CORE_DIR}/.git ]
-    then
-        pushd $PROVISION_CORE_DIR > /dev/null
-        PROVISION_CORE_VERSION=$(basename $(git symbolic-ref HEAD))
-        popd > /dev/null
-    else
-        PROVISION_CORE_VERSION="master"
-    fi
-fi
+PROVISION_CORE_VERSION="" # default to current branch or master if no repo
 PROVISION_EDX_REPO=${PROVISION_EDX_REPO:="https://github.com/edx/configuration"}
 PROVISION_EDX_VERSION=${PROVISION_EDX_VERSION:-"aspen.1"}
 PROVISION_EDX_DIR=${PROVISION_EDX_DIR:-"${PROVISION_BASE_DIR}/edx/configuration"}
@@ -95,6 +84,13 @@ then
 	apt-get update
 fi
 
+if ! is_installed git
+then
+	has_internet || die "git is required, but we can't install it without a net connection"	
+	step "Installing git"
+	apt-get install -y git
+fi
+
 if ! is_installed pip 
 then
 	has_internet || die "Pip is required, but we can't install it without a net connection"	
@@ -140,6 +136,19 @@ eval `ssh-agent -s`
 ssh-add /root/.ssh/provisioning
 ssh-add -l
 ssh -i /root/.ssh/provisioning -o StrictHostKeyChecking=no localhost echo 'User key works, host key added!'
+
+if [ -z "$PROVISION_CORE_VERSION" ]
+then
+    # If the repo has been checked out, use the current branch
+    if [ -d ${PROVISION_CORE_DIR}/.git ]
+    then
+        pushd $PROVISION_CORE_DIR > /dev/null
+        PROVISION_CORE_VERSION=$(basename $(git symbolic-ref HEAD))
+        popd > /dev/null
+    else
+        PROVISION_CORE_VERSION="master"
+    fi
+fi
 
 PROVISION_BOOTSTRAP_DIR="${PROVISION_BOOTSTRAP_DIR:-$PROVISION_CORE_DIR}"
 PROVISION_BOOTSTRAP_PLAYBOOK="${PROVISION_BOOTSTRAP_PLAYBOOK:=ansible/bootstrap.yml}"
