@@ -4,7 +4,8 @@ import argparse
 import json
 import os
 
-ansibledir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../ansible")
+basedir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/..")
+ansibledir = basedir + "/ansible"
 parser = argparse.ArgumentParser(description='Custom Ansible inventory generator')
 parser.add_argument("--list", action="store_true", default=False)
 parser.add_argument("--host", nargs="?", default=False)
@@ -28,7 +29,7 @@ def config_cubietruck():
     groups.append("wap")
 
 # TODO: make this more flexible (roles, not just groups)?
-config_file="../force_groups"
+config_file = basedir + "/force_groups"
 if os.path.exists(config_file):
     disable_all_roles()
     groups = [ x.strip() for x in open(config_file,"r").readlines() ]
