@@ -152,24 +152,26 @@ fi
 
 PROVISION_BOOTSTRAP_DIR="${PROVISION_BOOTSTRAP_DIR:-$PROVISION_CORE_DIR}"
 PROVISION_BOOTSTRAP_PLAYBOOK="${PROVISION_BOOTSTRAP_PLAYBOOK:=ansible/bootstrap.yml}"
-PROVISION_BOOTSTRAP_PLAYBOOK_URL="${PROVISION_BOOTSTRAP_PLAYBOOK_URL:-https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_CORE_VERSION}/ansible/bootstrap.yml}"
+PROVISION_BOOTSTRAP_FALLBACK_URL="${PROVISION_BOOTSTRAP_FALLBACK_URL:-https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_CORE_VERSION}/ansible/bootstrap.yml}"
+PROVISION_BOOTSTRAP_INVENTORY=$PROVISION_CORE_INVENTORY
 # Can't find repo. Probably a fresh install, so download the bootstrap playbook
-if [ ! -e "$PROVISION_BOOTSTRAP_PLAYBOOK" ]
+if [ ! -e "$PROVISION_BOOTSTRAP_DIR/$PROVISION_BOOTSTRAP_PLAYBOOK" ]
 then
-	has_internet || die "Can't find repo, but no net access, so can't retrieve it either"
+	has_internet || die "Can't find bootstrap playbook, but no net access, so can't retrieve it either"
 	RAND=$RANDOM
-	PROVISION_BOOTSTRAP_DIR="/tmp/"
+	PROVISION_BOOTSTRAP_DIR="/tmp"
 	PROVISION_BOOTSTRAP_PLAYBOOK="${RAND}bootstrap.yml"
 	PROVISION_BOOTSTRAP_INVENTORY="${RAND}inventory.ini"
-	step "Provisioning repo not found. Downloading bootstrap playbook"
-	get_url $PROVISION_BOOTSTRAP_PLAYBOOK_URL > $PROVISION_BOOTSTRAP_DIR/$PROVISION_BOOTSTRAP_PLAYBOOK
+	step "Provisioning repo not found. Downloading fallback playbook for bootstrapping."
+	get_url $PROVISION_BOOTSTRAP_FALLBACK_URL > $PROVISION_BOOTSTRAP_DIR/$PROVISION_BOOTSTRAP_PLAYBOOK
 	cat > $PROVISION_BOOTSTRAP_DIR/$PROVISION_BOOTSTRAP_INVENTORY <<EOF
 [localhost]
 127.0.0.1
 EOF
-else
-	PROVISION_BOOTSTRAP_PLAYBOOK="bootstrap.yml"
-	PROVISION_BOOTSTRAP_INVENTORY=$INVENTORY
+    cat > $PROVISION_BOOTSTRAP_DIR/ansible.cfg <<EOF
+[defaults]
+host_key_checking=False
+EOF
 fi
 
 export ANSIBLE_HOST_KEY_CHECKING=False
