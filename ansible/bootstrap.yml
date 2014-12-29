@@ -1,0 +1,38 @@
+---
+- hosts: all
+  vars:
+    provision_repo: "https://github.com/usernamenumber/provision/"
+    provision_dir: "/usr/local/tunapanda/provision"
+    provision_ver: "bootstrap"
+    edx_repo: "https://github.com/tunapanda/configuration/"
+    edx_dir: "/usr/local/tunapanda/edx"
+    edx_ver: "master"
+  tasks:
+  - name: "install dependencies"
+    apt: 
+      name="{{ item }}"
+      state=installed
+    with_items:
+      - git
+
+  - name: "provisioning repo"
+    git: 
+      repo="{{ provision_repo }}"
+      dest="{{ provision_dir }}"
+      version="{{ provision_ver }}"
+      update=true
+
+  - name: "edx repo"
+    git:
+      repo="{{ edx_repo }}"
+      dest="{{ edx_dir }}"
+      version="{{ edx_ver }}"
+      update=true
+
+  - name: "provision at boot"
+    lineinfile:
+      dest="/etc/rc.local"
+      state="present"
+      regexp="{{ provision_dir }}"
+      line="[ -x '{{ provision_dir }}/scripts/bootstrap.sh' ] && {{ provision_dir }}/scripts/bootstrap.sh"
+
