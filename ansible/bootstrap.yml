@@ -15,26 +15,25 @@
     with_items:
       - git
 
-  - name: "provisioning repo"
-    git: 
-      repo="{{ provision_repo }}"
-      dest="{{ provision_dir }}"
-      version="{{ provision_ver }}"
-      update=yes
-      recursive=yes
+  - name: "Cloning/updating core repo"
+    include: "bootstrap_git.yml"
+    vars:
+      dir: "{{ provision_dir }}"
+      repo: "{{ provision_repo }}"
+      ver: "{{ provision_dir }}"
 
-  - name: "edx repo"
-    git:
-      repo="{{ edx_repo }}"
-      dest="{{ edx_dir }}"
-      version="{{ edx_ver }}"
-      update=yes
-      recursive=yes
+  - name: "Cloning/updating edx repo"
+    include: "bootstrap_git.yml"
+    vars:
+      dir: "{{ provision_dir }}"
+      repo: "{{ provision_repo }}"
+      ver: "{{ provision_dir }}"
 
   - name: "provision at boot"
     lineinfile:
       dest="/etc/rc.local"
       state="present"
       regexp="{{ provision_dir }}"
+      insertbefore="^exit"
       line="[ -x '{{ provision_dir }}/scripts/bootstrap.sh' ] && {{ provision_dir }}/scripts/bootstrap.sh"
 
