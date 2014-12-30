@@ -30,4 +30,4 @@
     state="directory"
     
 - include: captive.yml
-  when: {{ portal__require_login }}
+  when: "{{ portal__require_login }}"
