@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # Configs
 # All of these can be overridden by setting them as environment vars
