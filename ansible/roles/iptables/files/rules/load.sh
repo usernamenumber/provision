@@ -5,7 +5,7 @@ SCRIPTDIR=$(pwd)
 SCRIPTNAME="$(basename $0)"
 SCRIPTFULLNAME="${SCRIPTDIR}/${SCRIPTNAME}"
 
-export IPTABLES="/usr/bin/iptables"
+export IPTABLES="/sbin/iptables"
 [ -e rules.d ] || mkdir rules.d
 for s in rules.d/*
 do
