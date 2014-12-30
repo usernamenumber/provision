@@ -16,15 +16,3 @@ wap_interface: wlan1
 
 # You can override any of the variabes defined in 
 # roles/*/vars/main.yml here.
-apt_basic__enabled: false
-apt_localrepo__enabled: false
-build_iso__enabled: false
-common__enabled: false
-cubietruck__enabled: false
-desktop__enabled: false
-external_data_drive__enabled: false
-kalite__enabled: false
-users__enabled: false
-wap__enabled: false
-wifi_ap__enabled: false
-wikipedia__enabled: false
