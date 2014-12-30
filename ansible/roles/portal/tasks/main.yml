@@ -1,16 +1,11 @@
 ---
-- name: Installing captive portal dependencies
+- name: Installing portal dependencies
   apt:
     name="{{ item }}"
     state=installed
   with_items:
      - conntrack
      - psmisc
-
-- name: Adding sudo rules for captive portal
-  template:
-    src="portal_sudo.j2"
-    dest="/etc/sudoers.d/portal"
 
 - name: Linking portal content
   file: 
@@ -24,30 +19,15 @@
     dest="/usr/bin/"
     mode=0755
 
-- name: Installing captive portal login page
-  template:
-    src="site/auth.php.j2"
-    dest="{{ portal__docroot }}/auth.php"
-
-- name: Installing captive portal login page
+- name: Installing portal landing page
   template:
     src="site/index.php.j2"
     dest="{{ portal__docroot }}/index.php"
 
-- name: Setting up captive portal iptables rules
-  template:
-    src="firewall/captive_portal.j2"
-    dest="{{ iptables__rules_dir }}/captive_portal"
-  notify:
-    - reload iptables
-    
-- name: Creating captive portal data dir 
+- name: Creating portal data dir 
   file:
     path="{{ portal__data }}"
     state="directory"
     
-- name: Creating captive portal users list 
-  file:
-    path="{{ portal__users }}"
-    state="touch"
-    owner="{{ apache_user }}" # TODO: replace with variable
+- include: captive.yml
+  when: {{ portal__require_login }}

@@ -6,6 +6,7 @@ portal__users: "{{ portal__data }}/users"
 portal__lan: "{{ ansible_wlan1 }}"
 portal__inet: "{{ ansible_eth0 }}"
 portal__redirect: "{{ ansible_eth0 }}" 
+portal__require_login: false
 portal__capture_chain: "captive"
 portal__title: "x2go - Education in a box"
 

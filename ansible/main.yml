@@ -25,7 +25,10 @@
     - config.yml
     - config.cubietruck.yml
   roles:
-    - { role: cubietruck }
+    - { role: wap }
+    - { role: portal }
+    - { role: kalite }
+    - { role: wikipedia }
 
 - hosts: wap
   vars_files:
@@ -33,9 +36,6 @@
     - config.wap.yml
   roles:
     - { role: wap }
-
-- hosts: portal
-  vars_files:
-    - config.yml
-  roles:
     - { role: portal }
+    - { role: kalite }
+    - { role: wikipedia }

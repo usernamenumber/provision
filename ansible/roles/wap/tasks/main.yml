@@ -26,3 +26,12 @@
       regexp="^DAEMON_CONF=.*"
       line="DAEMON_CONF=/etc/hostapd.conf"
   notify: restart hostapd
+
+- name: IP masquerading
+  template:
+      src="firewall/masquerade.j2"
+      dest="{{ iptables_rules_dir }}/masquerade"
+      backup=yes
+  notify:
+    - reload iptables
+

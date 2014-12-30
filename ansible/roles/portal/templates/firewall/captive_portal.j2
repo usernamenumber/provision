@@ -1,5 +1,5 @@
 ## 
-## From http://www.andybev.com/index.php/Using_iptables_and_PHP_to_create_a_{{ portal__capture_chain }}_portal
+## From http://www.andybev.com/index.php/Using_iptables_and_PHP_to_create_a_captive_portal
 ## 
 
 # Create {{ portal__capture_chain }} chain
@@ -10,11 +10,7 @@ $IPTABLES -N {{ portal__capture_chain }} -t mangle
 # At the prerouting NAT stage this will DNAT them to the local
 # webserver for them to signup if they aren't authorised
 # Packets for unauthorised users are marked for dropping later
-for i in {{ portal__lan.device }}
-do
-	echo "Skippping {{ portal__capture_chain }} chain for $i"
-	#$IPTABLES -t mangle -A PREROUTING -i $i -j {{ portal__capture_chain }}
-done
+$IPTABLES -t mangle -A PREROUTING -i {{ portal__lan.device }} -j {{ portal__capture_chain }}
 
 ###### INTERNET CHAIN ##########
 # Allow authorised clients in, redirect all others to login webserver
@@ -44,8 +40,3 @@ $IPTABLES -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
 $IPTABLES -t filter -A INPUT -p tcp --dport 443 -j ACCEPT
 $IPTABLES -t filter -A INPUT -p udp --dport 53 -j ACCEPT
 $IPTABLES -t filter -A INPUT -m mark --mark 99 -j DROP
-
-# Enable Internet connection sharing
-echo "1" > /proc/sys/net/ipv4/ip_forward
-$IPTABLES -A FORWARD -o eth0 -m state --state ESTABLISHED,RELATED -j ACCEPT
-$IPTABLES -t nat -A POSTROUTING -o eth0 -j MASQUERADE

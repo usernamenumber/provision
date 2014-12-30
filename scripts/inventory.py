@@ -26,7 +26,6 @@ def config_cubietruck():
     for role in enabled_roles:
         options[role + "__enabled"] = True
     groups.append("cubietruck")
-    groups.append("wap")
 
 # TODO: make this more flexible (roles, not just groups)?
 config_file = basedir + "/force_groups"
