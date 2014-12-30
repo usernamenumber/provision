@@ -1,6 +1,7 @@
 ---
 dependencies:
 - role: debops.ifupdown
+  ifupdown: true
   ifupdown_external_interface: 'eth0'
   ifupdown_internal_interface: 'wlan0'
   ifupdown_interfaces: 
