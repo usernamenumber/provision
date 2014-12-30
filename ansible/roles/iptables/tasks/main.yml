@@ -22,7 +22,7 @@
 - name: Create rules.d
   file: 
     path="{{ iptables__rules_dir }}"
-    state="present"
+    state="directory"
     mode="0755"
 
 - name: Autoload the rules

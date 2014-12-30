@@ -182,10 +182,10 @@ ssh -o StrictHostKeyChecking=no git@github.com 'true' &> /dev/null
 # Clone/update the other repos
 step "Running bootstrap playbook"
 pushd ${PROVISION_BOOTSTRAP_DIR} > /dev/null
-ansible-playbook -vvvv \
-    -i $PROVISION_BOOTSTRAP_INVENTORY \
-    -e "provision_ver=$PROVISION_CORE_VERSION provision_repo=$PROVISION_CORE_REPO provision_dir=$PROVISION_CORE_DIR" \
-    $PROVISION_BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
+#ansible-playbook -vvvv \
+#    -i $PROVISION_BOOTSTRAP_INVENTORY \
+#    -e "provision_ver=$PROVISION_CORE_VERSION provision_repo=$PROVISION_CORE_REPO provision_dir=$PROVISION_CORE_DIR" \
+#    $PROVISION_BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
 popd > /dev/null
 
 #step "Running edX playbook"
