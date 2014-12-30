@@ -19,5 +19,11 @@
   notify:
     - reload iptables
 
+- name: Create rules.d
+  file: 
+    path="{{ iptables__rules_dir }}"
+    state="present"
+    mode="0755"
+
 - name: Autoload the rules
   template: src=iptables_init_script.j2 dest=/etc/init.d/iptables owner=root group=root mode=751

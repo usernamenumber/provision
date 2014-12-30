@@ -10,8 +10,6 @@
     dest="{{ iptables__rules_dir }}/captive_portal"
   notify:
     - reload iptables
-  when:
-    {{ portal__require_login }}
 
 - name: Installing portal login page
   template:

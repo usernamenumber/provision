@@ -30,7 +30,7 @@
 - name: IP masquerading
   template:
       src="firewall/masquerade.j2"
-      dest="{{ iptables_rules_dir }}/masquerade"
+      dest="{{ iptables__rules_dir }}/masquerade"
       backup=yes
   notify:
     - reload iptables
