@@ -1,0 +1,33 @@
+---
+# Get info on the repo dir
+- stat:
+    path={{ dir }} 
+    follow=yes
+  register: d
+
+# If directory exists, update but fail gracefully if there are
+# local changes.
+- name: "Updating repository repo in {{dir}}"
+  git: 
+    ssh_opts="-o StrictHostKeyChecking=no"
+    repo="{{ repo }}"
+    dest="{{ dir }}"
+    version="{{ ver }}"
+    update=yes
+    force=no
+    recursive=yes
+    track_submodules=yes
+  ignore_errors: yes
+  when: d.stat.exists == True
+  
+# If directory does not exist, clone it
+- name: "Cloning repository repo in {{dir}}"
+  git: 
+    ssh_opts="-o StrictHostKeyChecking=no"
+    repo="{{ repo }}"
+    dest="{{ dir }}"
+    version="{{ ver }}"
+    recursive=yes
+    track_submodules=yes
+  when: d.stat.exists == False
+  
