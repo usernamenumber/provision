@@ -174,7 +174,7 @@ host_key_checking=False
 EOF
 fi
 
-#export ANSIBLE_HOST_KEY_CHECKING=False
+export ANSIBLE_HOST_KEY_CHECKING=False
 # Cheap way to ensure that github's host key is known. Otherwise, even with the setting above,
 # ansible may stall if it tries to update a repo with an ssh url
 ssh -o StrictHostKeyChecking=no git@github.com 'true' &> /dev/null
