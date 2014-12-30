@@ -196,7 +196,7 @@ popd > /dev/null
 step "Running core playbook"
 pushd ${PROVISION_CORE_DIR} > /dev/null
 ansible-playbook -vvv \
-    -i $PROVISION_INVENTORY \
+    -i $PROVISION_CORE_INVENTORY \
     $PROVISION_CORE_PLAYBOOK || die "Could not run core playbook"
 popd > /dev/null
 
