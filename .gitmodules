@@ -1,6 +1,8 @@
-[submodule "ansible/roles/debops_ifupdown"]
-	path = ansible/roles/debops_ifupdown
+[submodule "ansible/roles/debops.ifupdown"]
+	path = ansible/roles/debops.ifupdown
 	url = https://github.com/debops/ansible-ifupdown
+	branch = master
 [submodule "ansible/roles/bind"]
-	path = ansible/roles/bind
-	url = https://github.com/tunapanda/ansible-role-bind
+    path = ansible/roles/bind
+    url = https://github.com/tunapanda/ansible-role-bind
+    branch = master
