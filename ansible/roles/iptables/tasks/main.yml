@@ -16,16 +16,9 @@
     src=rules/
     dest="{{ iptables__base_dir }}"
     mode="0755"
-
-- name: Create rules.d
-  file: 
-    path="{{ iptables__rules_dir }}"
-    state="directory"
-    mode="0755"
-
-- name: Restart iptables
   notify:
     - reload iptables
 
 - name: Autoload the rules
   template: src=iptables_init_script.j2 dest=/etc/init.d/iptables owner=root group=root mode=751
+
