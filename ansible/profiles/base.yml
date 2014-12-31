@@ -1,5 +1,0 @@
----
-- hosts: base
-  tasks:
-    - shell: "date > /tmp/prv.base.{{var1}}"
-    - shell: "date > /tmp/prv.base.{{var2}}"

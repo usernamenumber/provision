@@ -12,3 +12,5 @@ data/packages/*
 force_groups
 provisioning.txt
 localconfig.yml
+ansible/profiles/custom.yml
+ansible/profiles.yml

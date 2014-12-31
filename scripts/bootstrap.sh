@@ -9,11 +9,6 @@ PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
 PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"ansible/main.yml"}
 PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
 PROVISION_CORE_VERSION="" # default to current branch or master if no repo
-#PROVISION_EDX_REPO=${PROVISION_EDX_REPO:="https://github.com/edx/configuration"}
-#PROVISION_EDX_VERSION=${PROVISION_EDX_VERSION:-"aspen.1"}
-#PROVISION_EDX_DIR=${PROVISION_EDX_DIR:-"${PROVISION_BASE_DIR}/edx/configuration"}
-#PROVISION_EDX_PLAYBOOK=${PROVISION_EDX_PLAYBOOK:-"playbooks/edx_sandbox.yml"}
-#PROVISION_EDX_INVENTORY=${PROVISION_EDX_INVENTORY:-$PROVISION_CORE_INVENTORY}
 
 # Fatal errors
 function die() {
@@ -179,7 +174,6 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 # ansible may stall if it tries to update a repo with an ssh url
 ssh -o StrictHostKeyChecking=no git@github.com 'true' &> /dev/null
 
-# Clone/update the other repos
 step "Running bootstrap playbook"
 pushd ${PROVISION_BOOTSTRAP_DIR} > /dev/null
 #ansible-playbook -vvvv \
@@ -188,10 +182,34 @@ pushd ${PROVISION_BOOTSTRAP_DIR} > /dev/null
 #    $PROVISION_BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
 popd > /dev/null
 
-#step "Running edX playbook"
-#pushd ${PROVISION_EDX_DIR}/playbooks/ > /dev/null
-#ansible-playbook -vvv -i $PROVISION_EDX_INVENTORY $PROVISION_EDX_PLAYBOOK || die "Could not run edx playbook"
-#popd > /dev/null
+step "Building role list for 'custom' profile"
+pushd "${PROVISION_CORE_DIR}/ansible" > /dev/null
+cat > profiles/custom.yml <<EOF
+---
+### AUTO-GENERATED (changes will be lost) ###
+- hosts: custom
+  roles:
+EOF
+for r in roles/*
+do
+    f=$(basename $r);
+    echo "    - { role: $f, when: ${f}__enabled }" >> profiles/custom.yml
+done
+popd > /dev/null
+
+# TODO: Maybe this would be better in the bootstrap playbook using a proper
+#       template?
+step "Building profiles list"
+pushd "${PROVISION_CORE_DIR}/ansible" > /dev/null
+cat > profiles.yml <<EOF
+---
+### AUTO-GENERATED (changes will be lost) ###
+EOF
+for f in profiles/*.yml 
+do 
+    echo "- include: \"$f\"" >> profiles.yml
+done
+popd > /dev/null
 
 step "Running core playbook"
 pushd ${PROVISION_CORE_DIR} > /dev/null
