@@ -35,7 +35,7 @@
     chdir: "{{ kalite__provision__base_dir }}"
     creates: "{{ kalite__provision__base_dir }}/kalite/database/data.sqlite"
   sudo: yes
-  sudo_user: {{  kalite__user }}
+  sudo_user: "{{  kalite__user }}"
   notify: restart kalite
 
 - name: Installing kalite init script
