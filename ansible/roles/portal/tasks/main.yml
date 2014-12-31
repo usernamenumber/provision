@@ -10,7 +10,7 @@
 - name: Linking portal content
   file: 
     path="{{ portal__docroot }}" 
-    src="{{ data_dir }}/provision/ansible/roles/portal/web"
+    src="{{ provision__base_dir }}/provision/ansible/roles/portal/web"
     state=link
 
 - name: Installing rmtrack script
@@ -30,4 +30,4 @@
     state="directory"
     
 - include: captive.yml
-  when: "{{ portal__require_login }}"
+  when: portal__require_login

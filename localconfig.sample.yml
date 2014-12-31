@@ -1,0 +1,27 @@
+---
+# By default the provisioning system deploys the setup described in 
+# ansible/profiles/default.yml, though in some cases it can make
+# other guesses based on hardware architecture, etc. 
+# 
+# If you know what you are doing, you can override that behavior by 
+# creating a copy of this file called `localconfig.yml` and selecting
+# your own profiles below. 
+# 
+# Each file in `ansible/profiles/` represents an available profile.
+# Separate multiple profiles with commas.
+profiles: [ default ] 
+
+# You can also fine-tune settings here. You can get a list of
+# available settings and their default values by running:
+#
+#     cat ansible/roles/*/defaults/main.yml
+#
+# However, note that some roles may not be used, depending on
+# the profile(s) you are using.
+#
+# For the greatest flexibility, use the `custom` profile, and 
+# turn roles on and off with the ROLENAME__enabled settings.
+vars:
+  var1: "val1"
+  var2: "val2"
+  var3: "val3"

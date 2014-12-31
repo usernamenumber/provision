@@ -1,17 +1,5 @@
 ---
 dependencies:
 - role: debops.ifupdown
-  ifupdown: True
-  ifupdown_ignore_networkmanager: True
-  ifupdown_external_interface: "{{ wap__data_lan }}"
-  ifupdown_internal_interface: "{{ wap__data_wlan }}"
-  ifupdown_interfaces: 
-    - iface: "{{ ifupdown_external_interface }}"
-      inet: 'dhcp'
-    - iface: "{{ ifupdown_internal_interface }}"
-      inet: 'static'
-      options: | 
-        address "10.0.0.1"
-        netmask "255.0.0.0"
 - { role: dhcpd }
 - { role: iptables }

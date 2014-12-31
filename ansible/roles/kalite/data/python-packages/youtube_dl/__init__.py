@@ -118,14 +118,14 @@ def parseOpts(overrideArguments=None):
         userConf = _readOptions(userConfFile, None)
 
         if userConf is None:
-            appdata_dir = os.environ.get('appdata')
-            if appdata_dir:
+            appprovision__base_dir = os.environ.get('appdata')
+            if appprovision__base_dir:
                 userConf = _readOptions(
-                    os.path.join(appdata_dir, 'youtube-dl', 'config'),
+                    os.path.join(appprovision__base_dir, 'youtube-dl', 'config'),
                     default=None)
                 if userConf is None:
                     userConf = _readOptions(
-                        os.path.join(appdata_dir, 'youtube-dl', 'config.txt'),
+                        os.path.join(appprovision__base_dir, 'youtube-dl', 'config.txt'),
                         default=None)
 
         if userConf is None:

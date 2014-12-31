@@ -1,0 +1,7 @@
+---
+- hosts: default
+  roles:
+    - portal
+    - kalite
+    - wikipedia
+

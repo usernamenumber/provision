@@ -1,7 +1,7 @@
 ---
 wap__enabled: true
 wap__data_static_ip: "{{ ansible_default_ipv4.address }}"
-wap__data_lan: "eth0"
-wap__data_wlan: "wlan0"
+wap__data_lan: "{{ ifupdown_external_interface }}"
+wap__data_wlan: "{{ ifupdown_internal_interface }}"
 wap__data_ssid: "x2go"
 wap__data_domain: "x2go.org"

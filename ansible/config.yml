@@ -1,6 +1,6 @@
 ---
 #globalvar: GLOBAL
-data_dir: "/usr/local/tunapanda"
+provision__base_dir: "/usr/local/tunapanda"
 vagrant_share: "/vagrant"
 apache_dir: "/etc/apache2"
 apache_docroot: "/var/www"

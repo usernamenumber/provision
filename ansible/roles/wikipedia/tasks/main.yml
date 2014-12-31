@@ -34,29 +34,29 @@
 
 - name: Creating document root
   file:
-    path: "{{ wikipedia__data_dir }}"
+    path: "{{ wikipedia__provision__base_dir }}"
     state: "directory"
     owner: "{{ apache_user }}"
 
 - name: Creating 404 page
   template:
     src="notfound.html.j2"
-    dest="{{ wikipedia__data_dir }}/notfound.html"
+    dest="{{ wikipedia__provision__base_dir }}/notfound.html"
 
 - name: Linking Apache document root
   file: 
-    src:  "{{ wikipedia__data_dir }}" 
+    src:  "{{ wikipedia__provision__base_dir }}" 
     path: "{{ apache_docroot }}/wikipedia"
     state: link
     
-- name: Creating data dir {{ wikipedia__data_dir }}
-  file: path={{ wikipedia__data_dir }} state=directory
+- name: Creating data dir {{ wikipedia__provision__base_dir }}
+  file: path={{ wikipedia__provision__base_dir }} state=directory
 
-- name: Checking mount status of {{ wikipedia__data_dir }}
-  shell: mount | grep {{ wikipedia__data_dir }}
+- name: Checking mount status of {{ wikipedia__provision__base_dir }}
+  shell: mount | grep {{ wikipedia__provision__base_dir }}
   register: is_mounted
   ignore_errors: True
   
-#- name: Mounting {{ wikipedia__data_dir }}
-#  command: mount --bind {{ vagrant_share }}/ansible/roles/wikipedia/data {{ wikipedia__data_dir }}
+#- name: Mounting {{ wikipedia__provision__base_dir }}
+#  command: mount --bind {{ vagrant_share }}/ansible/roles/wikipedia/data {{ wikipedia__provision__base_dir }}
 #  when: is_mounted|failed

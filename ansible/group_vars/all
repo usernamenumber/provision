@@ -1,1 +1,9 @@
-globalvar: GROUP
+---
+provision__base_dir: "/usr/local/tunapanda"
+provision__data_dir: "{{ provision__base_dir }}/data"
+provision__default_packages: [ git, vim ] 
+
+# TODO: split these off into an Apache role
+apache_dir: "/etc/apache2"
+apache_docroot: "/var/www"
+apache_user: "www-data"

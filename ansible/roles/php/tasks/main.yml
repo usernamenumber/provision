@@ -4,7 +4,7 @@
 
 - name: Upgrade packages
   apt: upgrade=yes
-  when: "{{ apt_basic__upgrade_packages }}"
+  when: apt_basic__upgrade_packages
   
 - name: Installing PHP
   apt: name={{ item }} state=latest

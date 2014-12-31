@@ -11,3 +11,4 @@ data/packages/*
 /.idea
 force_groups
 provisioning.txt
+localconfig.yml

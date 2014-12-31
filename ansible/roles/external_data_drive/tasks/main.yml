@@ -1,13 +1,13 @@
 ---
-- name: Creating {{ data_dir }}/bin
+- name: Creating {{ provision__base_dir }}/bin
   file:
-    path: "{{ data_dir }}/bin"
+    path: "{{ provision__base_dir }}/bin"
     state: directory
 
 - name: Adding drive setup script
   template:
     src: "mount_external_drive.j2"
-    dest: "{{ data_dir }}/bin/mount_external_drive"
+    dest: "{{ provision__base_dir }}/bin/mount_external_drive"
     owner: root
     mode: 0744
 

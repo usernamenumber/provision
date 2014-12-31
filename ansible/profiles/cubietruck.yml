@@ -1,0 +1,4 @@
+---
+- hosts: cubietruck
+  roles:
+    - wap
