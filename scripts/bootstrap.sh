@@ -193,7 +193,7 @@ EOF
 for r in roles/*
 do
     f=$(basename $r);
-    echo "    - { role: $f, when: ${f}__enabled }" >> profiles/custom.yml
+    echo "    - { role: $f, when: ${f}__enabled is defined and ${f}__enabled }" >> profiles/custom.yml
 done
 popd > /dev/null
 
