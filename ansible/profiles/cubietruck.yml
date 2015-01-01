@@ -1,4 +1,5 @@
 ---
 - hosts: cubietruck
   roles:
+    - provision_base
     - wap

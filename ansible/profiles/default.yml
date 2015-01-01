@@ -1,6 +1,7 @@
 ---
 - hosts: default
   roles:
+    - provision_base
     - portal
     - kalite
     - wikipedia
