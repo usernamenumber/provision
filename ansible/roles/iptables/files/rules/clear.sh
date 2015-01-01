@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IPTABLES=/sbin/iptables
+IPTABLES=${IPTABLES:-{{ iptables__cmd }}}
 
 $IPTABLES -t nat -P PREROUTING ACCEPT
 $IPTABLES -t nat -P POSTROUTING ACCEPT
@@ -13,4 +13,3 @@ $IPTABLES -t mangle -F
 $IPTABLES -t nat -X
 $IPTABLES -t filter -X
 $IPTABLES -t mangle -X
-$IPTABLES -t filter 

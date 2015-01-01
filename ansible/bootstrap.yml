@@ -3,7 +3,7 @@
   vars:
     provision_repo: "https://github.com/usernamenumber/provision/"
     provision_dir: "/usr/local/tunapanda/provision"
-    provision_ver: "bootstrap"
+    provision_ver: "cubie_vagrant"
     edx_repo: "https://github.com/tunapanda/configuration/"
     edx_dir: "/usr/local/tunapanda/edx"
     edx_ver: "master"

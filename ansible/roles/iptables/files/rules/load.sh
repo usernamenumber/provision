@@ -6,7 +6,7 @@ SCRIPTNAME="$(basename $0)"
 SCRIPTFULLNAME="${SCRIPTDIR}/${SCRIPTNAME}"
 RULESDIR="${SCRIPTDIR}/rules.d"
 
-export IPTABLES="/sbin/iptables"
+export IPTABLES=${IPTABLES:-{{ iptables__cmd }}}
 [ -e $RULESDIR ] || mkdir $RULESDIR
 cd $RULESDIR
 for s in $(ls)
