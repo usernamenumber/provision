@@ -190,7 +190,7 @@ cat > profiles/custom.yml <<EOF
 - hosts: custom
   roles:
 EOF
-for r in roles/*
+for r in $( ls roles/ | grep -v '^provision_base$' )
 do
     f=$(basename $r);
     echo "    - { role: $f, when: ${f}__enabled is defined and ${f}__enabled }" >> profiles/custom.yml

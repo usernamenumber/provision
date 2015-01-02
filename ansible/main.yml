@@ -1,16 +1,15 @@
 ---
-# Common settings 
-- hosts: all
-  roles:
-    - provision_base
-    - external_data_drive
-    - debops.ifupdown
-    - users
-
-- include: "profiles.yml"
-#- include: "profiles/default.yml"
-#- include: "profiles/cubietruck.yml"
-
+# Basic, common settings
 - hosts: all
   tasks:
     - shell: echo "Last provisioning began $(date)" > {{ provision__base_dir }}/provisioning.txt
+  roles:
+    - { role: provision_base, when: provision_base__enabled is defined and provision_base__enabled }
+
+# Hand off to profiles mapped to groups returned by scripts/inventory.py
+- include: "profiles.yml"
+
+# Timestamp
+- hosts: all
+  tasks:
+    - shell: echo "Last provisioning completed $(date)" >> {{ provision__base_dir }}/provisioning.txt
