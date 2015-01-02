@@ -1,6 +1,6 @@
 [submodule "playbooks/roles/debops.ifupdown"]
 	path = playbooks/roles/debops.ifupdown
-	url = https://github.com/debops/playbooks-ifupdown
+	url = https://github.com/debops/ansible-ifupdown
 	branch = master
 [submodule "playbooks/roles/bind"]
 	path = playbooks/roles/bind
