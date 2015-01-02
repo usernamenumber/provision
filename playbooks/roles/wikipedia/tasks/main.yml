@@ -58,5 +58,5 @@
   ignore_errors: True
   
 #- name: Mounting {{ wikipedia__provision__base_dir }}
-#  command: mount --bind {{ vagrant_share }}/ansible/roles/wikipedia/data {{ wikipedia__provision__base_dir }}
+#  command: mount --bind {{ vagrant_share }}/playbooks/roles/wikipedia/data {{ wikipedia__provision__base_dir }}
 #  when: is_mounted|failed

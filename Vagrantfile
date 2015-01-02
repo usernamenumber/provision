@@ -16,7 +16,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 ### Uncomment this block for the old vagrant-based ansible 
 #  config.vm.provision "ansible" do |ansible|
 #    ansible.verbose = "vvvv"
-#    ansible.playbook = "ansible/main.yml"
+#    ansible.playbook = "playbooks/main.yml"
 #    ansible.sudo = true
 #  end
 

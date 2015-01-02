@@ -6,7 +6,7 @@ PROVISION_BASE_DIR=${PROVISION_BASE_DIR:-"/usr/local/tunapanda"}
 ## TODO: Change usernamenumber URLs back to tunapanda
 PROVISION_CORE_REPO=${PROVISION_CORE_REPO:-"http://github.com/usernamenumber/provision"}
 PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
-PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"ansible/main.yml"}
+PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"playbooks/main.yml"}
 PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
 PROVISION_CORE_VERSION="" # default to current branch or master if no repo
 
@@ -146,8 +146,8 @@ then
 fi
 
 PROVISION_BOOTSTRAP_DIR="${PROVISION_BOOTSTRAP_DIR:-$PROVISION_CORE_DIR}"
-PROVISION_BOOTSTRAP_PLAYBOOK="${PROVISION_BOOTSTRAP_PLAYBOOK:=ansible/bootstrap.yml}"
-PROVISION_BOOTSTRAP_FALLBACK_URL="${PROVISION_BOOTSTRAP_FALLBACK_URL:-https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_CORE_VERSION}/ansible/bootstrap.yml}"
+PROVISION_BOOTSTRAP_PLAYBOOK="${PROVISION_BOOTSTRAP_PLAYBOOK:=playbooks/bootstrap.yml}"
+PROVISION_BOOTSTRAP_FALLBACK_URL="${PROVISION_BOOTSTRAP_FALLBACK_URL:-https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_CORE_VERSION}/playbooks/bootstrap.yml}"
 PROVISION_BOOTSTRAP_INVENTORY=$PROVISION_CORE_INVENTORY
 # Can't find repo. Probably a fresh install, so download the bootstrap playbook
 if [ ! -e "$PROVISION_BOOTSTRAP_DIR/$PROVISION_BOOTSTRAP_PLAYBOOK" ]

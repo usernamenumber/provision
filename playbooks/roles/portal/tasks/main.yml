@@ -10,7 +10,7 @@
 - name: Linking portal content
   file: 
     path="{{ portal__docroot }}" 
-    src="{{ provision__base_dir }}/provision/ansible/roles/portal/web"
+    src="{{ provision__base_dir }}/provision/playbooks/roles/portal/web"
     state=link
 
 - name: Installing rmtrack script
