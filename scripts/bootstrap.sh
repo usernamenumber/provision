@@ -163,7 +163,7 @@ then
 [localhost]
 127.0.0.1
 EOF
-    cat > $PROVISION_BOOTSTRAP_DIR/ansible.cfg <<EOF
+    cat > $PROVISION_BOOTSTRAP_DIR/playbooks.cfg <<EOF
 [defaults]
 host_key_checking=False
 EOF
@@ -183,7 +183,7 @@ ansible-playbook -vvvv \
 popd > /dev/null
 
 step "Building role list for 'custom' profile"
-pushd "${PROVISION_CORE_DIR}/ansible" > /dev/null
+pushd "${PROVISION_CORE_DIR}/playbooks" > /dev/null
 cat > profiles/custom.yml <<EOF
 ---
 ### AUTO-GENERATED (changes will be lost) ###
@@ -200,7 +200,7 @@ popd > /dev/null
 # TODO: Maybe this would be better in the bootstrap playbook using a proper
 #       template?
 step "Building profiles list"
-pushd "${PROVISION_CORE_DIR}/ansible" > /dev/null
+pushd "${PROVISION_CORE_DIR}/playbooks" > /dev/null
 cat > profiles.yml <<EOF
 ---
 ### AUTO-GENERATED (changes will be lost) ###
