@@ -11,7 +11,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "hashicorp/precise64"
   config.vm.synced_folder ".", "/usr/local/tunapanda/provision"
-  config.vm.provision "shell", path: "scripts/bootstrap.sh", keep_color: true
+
+  # These environment vars can be used to alter the behavior of
+  # the bootstrapping script.
+$script = <<SCRIPT
+export PROVISION_BASE_DIR="#{ENV['PROVISION_BASE_DIR']}"
+export PROVISION_CORE_REPO="#{ENV['PROVISION_CORE_REPO']}"
+export PROVISION_CORE_DIR="#{ENV['PROVISION_CORE_DIR']}"
+export PROVISION_CORE_PLAYBOOK="#{ENV['PROVISION_CORE_PLAYBOOK']}"
+export PROVISION_CORE_INVENTORY="#{ENV['PROVISION_CORE_INVENTORY']}"
+export PROVISION_CORE_VERSION="#{ENV['PROVISION_CORE_VERSION']}"
+export PROVISION_BOOTSTRAP_DIR="#{ENV['PROVISION_BOOTSTRAP_DIR']}"
+export PROVISION_BOOTSTRAP_PLAYBOOK="#{ENV['PROVISION_BOOTSTRAP_PLAYBOOK']}"
+export PROVISION_BOOTSTRAP_INVENTORY="#{ENV['PROVISION_BOOTSTRAP_INVENTORY']}"
+export PROVISION_BOOTSTRAP_FALLBACK_URL="#{ENV['PROVISION_BOOTSTRAP_FALLBACK_URL']}"
+/usr/local/tunapanda/provision/scripts/bootstrap.sh
+SCRIPT
+
+  config.vm.provision "shell", inline: $script, keep_color: true
+  #config.vm.provision "shell", path: "scripts/bootstrap.sh", keep_color: true
 
 ### Uncomment this block for the old vagrant-based ansible 
 #  config.vm.provision "ansible" do |ansible|
