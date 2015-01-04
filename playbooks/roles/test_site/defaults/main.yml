@@ -1,0 +1,4 @@
+---
+vidtest__docroot: "{{ provision__data_dir }}/vidtest"
+vidtest__urlpath: "/vidtest"
+vidtest__port: 8901

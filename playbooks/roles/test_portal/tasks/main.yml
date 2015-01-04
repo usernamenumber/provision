@@ -1,0 +1,30 @@
+---
+- name: Create site content dir
+  file: > 
+    path={{ portal__docroot }}
+    state=directory
+    owner=root group={{ common_web_user }} mode=755 
+
+- name: Deploy site content
+  template: >
+    src=site/index.html.j2
+    dest={{ portal__docroot }}/index.html
+    
+- name: Create subsites config dir
+  file: > 
+    path={{ portal__redirects }}
+    state=directory
+    owner=root group={{ common_web_user }} mode=755 
+    
+- name: Deploy site config
+  template: >
+    src=config/portal.j2
+    dest={{ nginx_sites_available_dir }}/portal
+    owner=root group={{ common_web_user }} mode=0640
+
+- name: Activate site config
+  file: >
+    src={{ nginx_sites_available_dir }}/portal
+    dest={{ nginx_sites_enabled_dir }}/portal
+    state=link owner=root group=root
+  notify: reload nginx

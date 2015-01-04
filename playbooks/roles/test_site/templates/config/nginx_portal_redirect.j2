@@ -1,0 +1,4 @@
+location {{ vidtest__urlpath }} {
+#foo
+        proxy_pass http://localhost:{{ vidtest__port }}/;
+}

@@ -1,0 +1,5 @@
+server {
+  listen {{ portal__port|default("") }};
+  root {{ portal__docroot }};
+  include "{{ portal__redirects }}/*";
+}
