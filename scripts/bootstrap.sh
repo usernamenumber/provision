@@ -8,7 +8,7 @@ PROVISION_CORE_REPO=${PROVISION_CORE_REPO:-"http://github.com/usernamenumber/pro
 PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
 PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"playbooks/main.yml"}
 PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
-PROVISION_CORE_VERSION="${PROVISION_CORE_VERSION:-''}" # default to current branch or master if no repo
+PROVISION_CORE_VERSION="${PROVISION_CORE_VERSION:-}" # default to current branch or master if no repo
 
 # Fatal errors
 function die() {
