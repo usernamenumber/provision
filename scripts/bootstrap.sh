@@ -165,7 +165,7 @@ then
 [localhost]
 127.0.0.1
 EOF
-    cat > $PROVISION_BOOTSTRAP_DIR/playbooks.cfg <<EOF
+    cat > $PROVISION_BOOTSTRAP_DIR/ansible.cfg <<EOF
 [defaults]
 host_key_checking=False
 EOF
