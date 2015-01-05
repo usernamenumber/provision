@@ -8,7 +8,7 @@ PROVISION_CORE_REPO=${PROVISION_CORE_REPO:-"http://github.com/usernamenumber/pro
 PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
 PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"playbooks/main.yml"}
 PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
-PROVISION_CORE_VERSION="" # default to current branch or master if no repo
+PROVISION_CORE_VERSION="${PROVISION_CORE_VERSION:-''}" # default to current branch or master if no repo
 
 # Fatal errors
 function die() {
@@ -159,6 +159,8 @@ then
 	PROVISION_BOOTSTRAP_INVENTORY="${RAND}inventory.ini"
 	step "Provisioning repo not found. Downloading fallback playbook for bootstrapping."
 	get_url $PROVISION_BOOTSTRAP_FALLBACK_URL > $PROVISION_BOOTSTRAP_DIR/$PROVISION_BOOTSTRAP_PLAYBOOK
+	# TODO: Fix this quick and dirty hack
+	get_url https://raw.githubusercontent.com/usernamenumber/provision/${PROVISION_CORE_VERSION}/playbooks/bootstrap_git.yml > bootstrap_git.yml || die "could not get bootstrap_git.yml"
 	cat > $PROVISION_BOOTSTRAP_DIR/$PROVISION_BOOTSTRAP_INVENTORY <<EOF
 [localhost]
 127.0.0.1
