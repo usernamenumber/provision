@@ -7,7 +7,11 @@
     - { role: provision_base, when: provision_base__enabled is defined and provision_base__enabled }
 
 # Hand off to profiles mapped to groups returned by scripts/inventory.py
-- include: "profiles.yml"
+#- include: profiles.yml
+- include: default.yml
+- include: cubietruck.yml
+- include: custom.yml
+
 
 # Timestamp
 - hosts: all
