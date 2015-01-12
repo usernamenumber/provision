@@ -1,30 +1,38 @@
 ---
-- name: Create site content dir
+- shell: echo "{{ portal__subsites }}" | tee /tmp/subsites
+  
+  
+- name: Create subsite content dirs
   file: 
-    path={{ portal_site__docroot }}
+    path={{ item.docroot }}
     state=directory
     owner=root group={{ common_web_user }} mode=755 
+  with_items: portal__subsites
 
-- name: Deploy site content
+- name: Deploy subsite content
   template:
     src=site/index.html.j2
-    dest={{ portal_site__docroot }}/index.html
+    dest={{ item.docroot }}/index.html
+  with_items: portal__subsites
     
-- name: Deploy site redirect instructions
+- name: Deploy subsite redirect instructions
   template:
     src=config/nginx_portal_redirect.j2
     dest={{ portal__redirects }}/vidtest
     owner=root group={{ common_web_user }} mode=0640
+  with_items: portal__subsites
     
-- name: Deploy site config
+- name: Deploy subsite config
   template:
     src=config/nginx_server.j2
     dest={{ nginx_sites_available_dir }}/vidtest
     owner=root group={{ common_web_user }} mode=0640
+  with_items: portal__subsites
 
-- name: Activate site config
+- name: Activate subsite config
   file:
     src={{ nginx_sites_available_dir }}/vidtest
     dest={{ nginx_sites_enabled_dir }}/vidtest
     state=link owner=root group=root
+  with_items: portal__subsites
   notify: reload nginx

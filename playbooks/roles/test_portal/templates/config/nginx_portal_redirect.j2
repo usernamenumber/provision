@@ -1,0 +1,3 @@
+location {{ item.urlpath }} {
+        proxy_pass http://localhost:{{ item.port }}/;
+}

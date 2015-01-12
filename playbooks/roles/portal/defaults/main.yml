@@ -1,6 +1,7 @@
 ---
 portal__enabled: false
 portal__docroot: "{{ apache_docroot }}/portal"
+portal__urlpath: "/portal"
 portal__data: "{{ provision__base_dir }}/data/captive_portal"
 portal__users: "{{ portal__data }}/users"
 portal__lan: "{{ ansible_wlan1 }}"

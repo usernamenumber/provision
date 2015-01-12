@@ -1,13 +1,23 @@
 ---
+- hosts: all
+  tasks:
+    - shell: echo "STARTING" > /tmp/portaltest
+    
 # Basic, common settings
 - hosts: all
   tasks:
     - shell: echo "Last provisioning began $(date)" > {{ provision__base_dir }}/provisioning.txt
   roles:
     - { role: provision_base, when: provision_base__enabled is defined and provision_base__enabled }
+    - vidtest
+      
+  # TODO: This should go elsewhere...
+  handlers:
+    - name: reload nginx
+      service: name=nginx state=reloaded
 
 # Hand off to profiles mapped to groups returned by scripts/inventory.py
-- include: "profiles.yml"
+#- include: "profiles.yml"
 
 # Timestamp
 - hosts: all

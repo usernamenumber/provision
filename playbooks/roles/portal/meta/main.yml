@@ -1,6 +1,10 @@
 ---
 dependencies:
-  - { role: php }
-  - { role: bind }
-  - { role: wap }
-  - { role: iptables }
+  - php 
+  - bind 
+  - wap 
+  - iptables 
+  - role: test_site
+    vars:
+        - portal_site__docroot: "{{ portal__docroot }}"
+        - portal_site__urlpath: "{{ portal__urlpath }}"

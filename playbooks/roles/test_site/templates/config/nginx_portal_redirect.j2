@@ -1,4 +1,4 @@
-location {{ vidtest__urlpath }} {
+location {{ portal_site__urlpath }} {
 #foo
-        proxy_pass http://localhost:{{ vidtest__port }}/;
+        proxy_pass http://localhost:{{ portal_site__port }}/;
 }

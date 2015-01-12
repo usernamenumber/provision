@@ -1,3 +1,4 @@
 ---
-dependencies:
-  - nginx
+allow_duplicates: yes
+#dependencies:
+#  - nginx

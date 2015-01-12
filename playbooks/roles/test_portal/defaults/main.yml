@@ -11,3 +11,5 @@ portal__inet: "{{ ansible_eth0 }}"
 portal__redirect: "{{ ansible_eth0 }}" 
 portal__require_login: false
 portal__capture_chain: "captive"
+portal__subsites: []
+
