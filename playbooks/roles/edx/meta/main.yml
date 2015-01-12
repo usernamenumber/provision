@@ -1,0 +1,24 @@
+---
+dependencies:
+  - role: nginx
+#    nginx_sites:
+#    - cms
+#    - lms
+#    - forum
+#    - xqueue
+#    - certs
+#    - lms
+#    - cms
+#  - edxlocal
+#  - mongo
+#  - { role: 'edxapp', celery_worker: True }
+#  - edxapp
+#  - demo
+#  - { role: 'rabbitmq', rabbitmq_ip: '127.0.0.1' }
+#  - oraclejdk
+#  - elasticsearch
+#  - forum
+#  - { role: "xqueue", update_users: True }
+#  - certs
+#  - role: analytics-api
+#    when: ANALYTICS_API_GIT_IDENTITY

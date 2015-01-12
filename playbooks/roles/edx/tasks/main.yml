@@ -1,0 +1,6 @@
+---
+- git:  
+    repo={{ edx__repo }}
+    version={{ edx__version }}
+    dest={{ edx__config_dir }}
+

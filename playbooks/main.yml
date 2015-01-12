@@ -17,7 +17,7 @@
       service: name=nginx state=reloaded
 
 # Hand off to profiles mapped to groups returned by scripts/inventory.py
-#- include: "profiles.yml"
+#- include: profiles.yml
 
 # Timestamp
 - hosts: all
