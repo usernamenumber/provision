@@ -1,19 +1,12 @@
 ---
 provision__base_dir: "/usr/local/tunapanda"
 provision__data_dir: "{{ provision__base_dir }}/data"
+provision__ext_dir: "{{ provision__base_dir }}/provision/ext"
 provision__default_packages: [ git, vim, screen ] 
+provision__primary_iface: ansible_eth1
 
-COMMON_APP_DIR: "{{ provision__data_dir }}"
-COMMON_DATA_DIR: "{{ provision__data_dir }}"
-common_web_user: www-data
 
 # TODO: split these off into an Apache role
 apache_dir: "/etc/apache2"
 apache_docroot: "/var/www"
 apache_user: "www-data"
-
-# TODO: This should be elsewhere
-# (probably should call edx's nginx role, overriding this var)
-nginx_config_dir: "/etc/nginx"
-nginx_sites_available_dir: "{{ nginx_config_dir }}/sites-available"
-nginx_sites_enabled_dir: "{{ nginx_config_dir }}/sites-enabled"

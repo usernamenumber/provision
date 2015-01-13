@@ -14,3 +14,4 @@ provisioning.txt
 localconfig.yml
 ansible/profiles/custom.yml
 ansible/profiles.yml
+ext/*

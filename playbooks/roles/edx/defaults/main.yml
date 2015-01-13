@@ -1,21 +1,2 @@
----
-edx__enabled: false
-edx__repo: "https://github.com/edx/configuration/"
-edx__version: "aspen.1"
-edx__base_dir: "{{ provision__data_dir }}/edx"
-edx__config_dir: "{{ edx__base_dir }}/provisioning"
-
-
-
-migrate_db: 'yes'
-openid_workaround: true
-EDXAPP_LMS_NGINX_PORT: '80'
-EDX_ANSIBLE_DUMP_VARS: true
-CERTS_DOWNLOAD_URL: 'http://192.168.33.10:18090'
-CERTS_VERIFY_URL: 'http://192.168.33.10:18090'
-# used for releases
-edx_platform_version: '{{ OPENEDX_RELEASE | default("master") }}'
-ora2_version: '{{ OPENEDX_RELEASE | default("master") }}'
-certs_version: '{{ OPENEDX_RELEASE | default("master") }}'
-forum_version: '{{ OPENEDX_RELEASE | default("master") }}'
-xqueue_version: '{{ OPENEDX_RELEASE | default("master") }}'
+edx__prereq_packages:
+  - gunicorn

@@ -7,9 +7,18 @@
 - hosts: all
   tasks:
     - shell: echo "Last provisioning began $(date)" > {{ provision__base_dir }}/provisioning.txt
+    - git:  
+        repo={{ edx__repo }}
+        version={{ edx__version }}
+        dest={{ edx__provision_dir }}
+    
+    - apt:
+        name={{ item }}
+        state=installed
+      with_items: edx__prereq_packages
+    
   roles:
-    - { role: provision_base, when: provision_base__enabled is defined and provision_base__enabled }
-    - vidtest
+    - edx
       
   # TODO: This should go elsewhere...
   handlers:
