@@ -1,7 +1,6 @@
 ---
 ifupdown: True
 ifupdown_ignore_networkmanager: True
-#ifupdown_external_interface: "{{ ansible_default_ipv4.alias }}"
 ifupdown_external_interface: "eth0"
 ifupdown_internal_interface: "wlan0"
 ifupdown_interfaces: 
@@ -12,3 +11,8 @@ ifupdown_interfaces:
       options: | 
         address "10.0.0.1"
         netmask "255.0.0.0"
+
+wap__enabled: true
+portal__enabled: true
+vidtest__enabled: true
+edx_portal__enabled: true

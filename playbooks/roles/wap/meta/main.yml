@@ -1,5 +1,5 @@
 ---
 dependencies:
 - role: debops.ifupdown
-- { role: dhcpd }
-- { role: iptables }
+- role: dhcpd
+- role: iptables

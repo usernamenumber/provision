@@ -1,13 +1,14 @@
 ---
+# This playbook requires the following variables to be set on the command line (ansible-playbook -e...)
+# Normally this is done from scripts/bootstrap.sh
+# - provision_repo
+# - provision_dir
+# - provision_ver
 - hosts: all
-  vars:
-    provision_repo: "https://github.com/usernamenumber/provision/"
-    provision_dir: "/usr/local/tunapanda/provision"
-    provision_ver: "cubie_vagrant"
   tasks:
   - name: "install dependencies"
     apt: 
-      name="{{ item }}"
+      name={{ item }}
       state=installed
     with_items:
       - git
@@ -23,7 +24,7 @@
     lineinfile:
       dest="/etc/rc.local"
       state="present"
-      regexp="{{ provision_dir }}"
+      regexp={{ provision_dir }}
       insertbefore="^exit"
       line="[ -x '{{ provision_dir }}/scripts/bootstrap.sh' ] && {{ provision_dir }}/scripts/bootstrap.sh"
 
