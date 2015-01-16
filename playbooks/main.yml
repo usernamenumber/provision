@@ -5,20 +5,21 @@
     
 # Basic, common settings
 - hosts: all
-  tasks:
-    - shell: echo "Last provisioning began $(date)" > {{ provision__base_dir }}/provisioning.txt
-    - git:  
-        repo={{ edx__repo }}
-        version={{ edx__version }}
-        dest={{ edx__provision_dir }}
-    
-    - apt:
-        name={{ item }}
-        state=installed
-      with_items: edx__prereq_packages
+#  tasks:
+#    - shell: echo "Last provisioning began $(date)" > {{ provision__base_dir }}/provisioning.txt
+#    - git:  
+#        repo={{ edx__repo }}
+#        version={{ edx__version }}
+#        dest={{ edx__provision_dir }}
+#    
+#    - apt:
+#        name={{ item }}
+#        state=installed
+#      with_items: edx__prereq_packages
     
   roles:
-    - edx
+    - portal_edx
+    - vidtest
       
   # TODO: This should go elsewhere...
   handlers:

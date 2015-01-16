@@ -1,8 +1,8 @@
 ---
 dependencies:
-  - role: test_portal
+  - role: portal
     portal__subsites:
-      - name: "Video Portal" 
+      - name: "videotest" 
         docroot: "{{ vidtest__docroot }}"
         urlpath: "{{ vidtest__urlpath }}"
-        port: "{{ vidtest__port }}"
+        #port: "{{ vidtest__port }}"

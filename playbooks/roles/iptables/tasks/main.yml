@@ -11,11 +11,20 @@
   yum: pkg=iptables
   when: ansible_os_family == 'RedHat'
 
-- name: Set up iptables 
-  copy:
-    src=rules/
-    dest="{{ iptables__base_dir }}"
+- name: Create iptables rules dir
+  file:
+    state=directory
+    dest="{{ iptables__base_dir }}/rules"
     mode="0755"
+
+- name: Set up iptables 
+  template:
+    src={{ item }}
+    dest="{{ iptables__base_dir }}/rules"
+    mode="0744"
+  with_items:
+    - clear.sh
+    - load.sh
   notify:
     - reload iptables
 

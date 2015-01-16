@@ -1,10 +1,11 @@
 ---
+allow_duplicates: yes
 dependencies:
   - php 
   - bind 
   - wap 
   - iptables 
-  - role: test_site
-    vars:
-        - portal_site__docroot: "{{ portal__docroot }}"
-        - portal_site__urlpath: "{{ portal__urlpath }}"
+#  - role: test_site
+#    vars:
+#        - portal_site__docroot: "{{ portal__docroot }}"
+#        - portal_site__urlpath: "{{ portal__urlpath }}"

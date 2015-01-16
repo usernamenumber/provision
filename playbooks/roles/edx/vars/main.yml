@@ -29,6 +29,6 @@ forum_version: "{{ edx__version }}"
 xqueue_version: "{{ edx__version }}"
 
 # From edx/nginx
-nginx_config_dir: "/etc/nginx"
+nginx_config_dir: "/edx/app/nginx"
 nginx_sites_available_dir: "{{ nginx_config_dir }}/sites-available"
 nginx_sites_enabled_dir: "{{ nginx_config_dir }}/sites-enabled"

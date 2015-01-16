@@ -12,4 +12,9 @@ portal__redirect: "{{ ansible_eth0 }}"
 portal__require_login: false
 portal__capture_chain: "captive"
 portal__subsites: []
+nginx_sites_available_dir: "/edx/app/nginx/sites-available/"
+nginx_sites_enabled_dir: "/edx/app/nginx/sites-enabled/"
 
+
+# TODO should go elsehwere
+common_web_user: www-data

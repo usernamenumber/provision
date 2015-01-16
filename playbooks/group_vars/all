@@ -3,10 +3,18 @@ provision__base_dir: "/usr/local/tunapanda"
 provision__data_dir: "{{ provision__base_dir }}/data"
 provision__ext_dir: "{{ provision__base_dir }}/provision/ext"
 provision__default_packages: [ git, vim, screen ] 
-provision__primary_iface: ansible_eth1
+provision__primary_iface: "{{ ansible_wlan0 }}"
 
-
-# TODO: split these off into an Apache role
+# TODO: split these off into an Apache role?
 apache_dir: "/etc/apache2"
 apache_docroot: "/var/www"
 apache_user: "www-data"
+
+# Borrowed from / overriding edX
+nginx_sites_available_dir: "/edx/app/nginx/sites-available/"
+nginx_sites_enabled_dir: "/edx/app/nginx/sites-enabled/"
+common_web_user: www-data
+EDXAPP_LMS_NGINX_PORT: '81'
+
+
+iptables__cmd: "/sbin/iptables"

@@ -1,33 +1,48 @@
 ---
 - name: Installing portal dependencies
   apt:
-    name="{{ item }}"
+    name={{ item }}
     state=installed
   with_items:
+     - nginx
+     - php5-fpm
      - conntrack
      - psmisc
-
-- name: Linking portal content
-  file: 
-    path="{{ portal__docroot }}" 
-    src="{{ provision__base_dir }}/provision/playbooks/roles/portal/web"
-    state=link
 
 - name: Installing rmtrack script
   copy:
     src=rmtrack
-    dest="/usr/bin/"
+    dest=/usr/bin/
     mode=0755
 
-- name: Installing portal landing page
-  template:
-    src="site/index.php.j2"
-    dest="{{ portal__docroot }}/index.php"
-
-- name: Creating portal data dir 
-  file:
-    path="{{ portal__data }}"
-    state="directory"
-    
 - include: captive.yml
   when: portal__require_login
+
+- name: Create site content dirs
+  file: 
+    path={{ item }}
+    state=directory
+    owner=root group={{ common_web_user }} mode=755 
+  with_items:
+    - "{{ portal__docroot }}"
+    - "{{ portal__redirects }}"
+
+- name: Install portal landing page
+  template:
+    src=site/index.php.j2
+    dest={{ portal__docroot }}/index.php
+
+- name: Deploy site config
+  template:
+    src=nginx/portal.j2
+    dest={{ nginx_sites_available_dir }}/portal
+    owner=root group={{ common_web_user }} mode=0640
+
+- name: Activate site config
+  file:
+    src={{ nginx_sites_available_dir }}/portal
+    dest={{ nginx_sites_enabled_dir }}/portal
+    state=link owner=root group=root
+  notify: reload nginx
+  
+- include: portal_site.yml

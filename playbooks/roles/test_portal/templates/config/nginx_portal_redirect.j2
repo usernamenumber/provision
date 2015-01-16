@@ -1,3 +1,7 @@
 location {{ item.urlpath }} {
-        proxy_pass http://localhost:{{ item.port }}/;
+	{% if item.port is defined %}
+		proxy_pass http://localhost:{{ item.port }};
+	{% else %}
+		alias {{ item.docroot }};
+	{% endif %}
 }
