@@ -1,4 +1,0 @@
----
-portal_site__docroot: "{{ provision__data_dir }}/vidtest"
-portal_site__urlpath: "/vidtest"
-portal_site__port: 8901
