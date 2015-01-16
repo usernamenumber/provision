@@ -1,34 +1,14 @@
 ---
 - hosts: all
   tasks:
-    - shell: echo "STARTING" > /tmp/portaltest
-    
-# Basic, common settings
-- hosts: all
-#  tasks:
-#    - shell: echo "Last provisioning began $(date)" > {{ provision__base_dir }}/provisioning.txt
-#    - git:  
-#        repo={{ edx__repo }}
-#        version={{ edx__version }}
-#        dest={{ edx__provision_dir }}
-#    
-#    - apt:
-#        name={{ item }}
-#        state=installed
-#      with_items: edx__prereq_packages
-    
-  roles:
-    - provision_base
-    - portal_edx
-    - vidtest
+    - shell: echo "Last provisioning started at $(date)" > {{ provision__base_dir }}/provisioning.txt
+
+  include: roles.yml
       
   # TODO: This should go elsewhere...
   handlers:
     - name: reload nginx
       service: name=nginx state=reloaded
-
-# Hand off to profiles mapped to groups returned by scripts/inventory.py
-#- include: profiles.yml
 
 # Timestamp
 - hosts: all

@@ -13,8 +13,8 @@
 ## pushed to the branch specified by {{ ver }}. 
   git: 
     ssh_opts="-o StrictHostKeyChecking=no"
-    repo="{{ repo }}"
-    dest="{{ dir }}"
+    repo={{ repo }}
+    dest={{ dir }}
     update=yes
     force=no
     recursive=yes
@@ -26,9 +26,9 @@
 - name: "Cloning repository repo in {{dir}}"
   git: 
     ssh_opts="-o StrictHostKeyChecking=no"
-    repo="{{ repo }}"
-    dest="{{ dir }}"
-    version="{{ ver }}"
+    repo={{ repo }}
+    dest={{ dir }}
+    version={{ ver }}
     recursive=yes
     track_submodules=yes
   when: d.stat.exists == False

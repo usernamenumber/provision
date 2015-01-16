@@ -1,15 +1,5 @@
 #!/bin/bash
 
-# Configs
-# All of these can be overridden by setting them as environment vars
-PROVISION_BASE_DIR=${PROVISION_BASE_DIR:-"/usr/local/tunapanda"}
-## TODO: Change usernamenumber URLs back to tunapanda
-PROVISION_CORE_REPO=${PROVISION_CORE_REPO:-"http://github.com/usernamenumber/provision"}
-PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
-PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"playbooks/main.yml"}
-PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
-PROVISION_CORE_VERSION="${PROVISION_CORE_VERSION:-}" # default to current branch or master if no repo
-
 # Fatal errors
 function die() {
 	echo ""
@@ -67,6 +57,25 @@ function get_url() {
 	fi
 }
 
+
+# Configs
+# All of these can be overridden by setting them as environment vars
+PROVISION_AUTO_UPDATE=${PROVISION_AUTO_UPDATE:-true}
+PROVISION_BASE_DIR=${PROVISION_BASE_DIR:-"/usr/local/tunapanda"}
+## TODO: Change usernamenumber URLs back to tunapanda
+PROVISION_CORE_REPO=${PROVISION_CORE_REPO:-"http://github.com/usernamenumber/provision"}
+PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
+PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
+PROVISION_CORE_VERSION="${PROVISION_CORE_VERSION:-}" # default to current branch or master if no repo
+
+CUSTOM_PLAYBOOK=${PROVISION_CORE_DIR}/playbooks/localconfig.yml 
+if [ -f $CUSTOM_PLAYBOOK ]
+then
+    note "Using custom playbook $CUSTOM_PLAYBOOK"
+    PROVISION_CORE_PLAYBOOK=$CUSTOM_PLAYBOOK
+else
+    PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"playbooks/main.yml"}
+fi
 if [ $EUID -ne 0 ]
 then
 	die 'Must be run as root!'
@@ -176,44 +185,35 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 # ansible may stall if it tries to update a repo with an ssh url
 ssh -o StrictHostKeyChecking=no git@github.com 'true' &> /dev/null
 
-step "Running bootstrap playbook"
-pushd ${PROVISION_BOOTSTRAP_DIR} > /dev/null
-ansible-playbook -vvvv \
-    -i $PROVISION_BOOTSTRAP_INVENTORY \
-    -e "provision_ver=$PROVISION_CORE_VERSION provision_repo=$PROVISION_CORE_REPO provision_dir=$PROVISION_CORE_DIR" \
-    $PROVISION_BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
-popd > /dev/null
+if $PROVISION_AUTO_UPDATE && has_internet 
+then
+    step "Running bootstrap playbook"
+    pushd ${PROVISION_BOOTSTRAP_DIR} > /dev/null
+    ansible-playbook -vvvv \
+        -i $PROVISION_BOOTSTRAP_INVENTORY \
+        -e "provision_ver=$PROVISION_CORE_VERSION provision_repo=$PROVISION_CORE_REPO provision_dir=$PROVISION_CORE_DIR" \
+        $PROVISION_BOOTSTRAP_PLAYBOOK || die "Could not run bootstrap playbook"
+    popd > /dev/null
+else 
+    note "No Internet, so skipping playbook updates"
+fi
 
-step "Building role list for 'custom' profile"
-pushd "${PROVISION_CORE_DIR}/playbooks" > /dev/null
-cat > profiles/custom.yml <<EOF
+step "Generating roles.yml"
+pushd ${PROVISION_CORE_DIR} > /dev/null
+cat > roles.yml <<EOF
 ---
 ### AUTO-GENERATED (changes will be lost) ###
-- hosts: custom
+- hosts: all
   roles:
 EOF
-for r in $( ls roles/ | grep -v '^provision_base$' )
-do
-    f=$(basename $r);
-    echo "    - { role: $f, when: ${f}__enabled is defined and ${f}__enabled }" >> profiles/custom.yml
-done
+  for r in $(find roles/ -maxdepth 1 -mindepth 1 -type d)
+  do
+          f=$(basename $r);
+              echo "    - { role: $f, when: ${f}__enabled is defined and ${f}__enabled }" >> roles.yml
+          done
 popd > /dev/null
 
-# TODO: Maybe this would be better in the bootstrap playbook using a proper
-#       template?
-step "Building profiles list"
-pushd "${PROVISION_CORE_DIR}/playbooks" > /dev/null
-cat > profiles.yml <<EOF
----
-### AUTO-GENERATED (changes will be lost) ###
-EOF
-for f in profiles/*.yml 
-do 
-    echo "- include: \"$f\"" >> profiles.yml
-done
-popd > /dev/null
-
-step "Running core playbook"
+step "Running core playbook, ${PROVISION_CORE_PLAYBOOK}"
 pushd ${PROVISION_CORE_DIR} > /dev/null
 ansible-playbook -vvv \
     -i $PROVISION_CORE_INVENTORY \

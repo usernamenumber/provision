@@ -11,7 +11,5 @@ data/packages/*
 /.idea
 force_groups
 provisioning.txt
-localconfig.yml
-playbooks/profiles/custom.yml
-playbooks/profiles.yml
+playbooks/localconfig.yml
 ext/*
