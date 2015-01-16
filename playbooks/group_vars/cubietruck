@@ -16,3 +16,9 @@ wap__enabled: true
 portal__enabled: true
 vidtest__enabled: true
 edx_portal__enabled: true
+kalite__enabled: true
+
+# Tell playbooks to assume edx is pre-installed
+# this changes what our options are for 
+# (re-)configuring it.
+edx__pre_installed: true
