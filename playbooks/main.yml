@@ -18,6 +18,7 @@
 #      with_items: edx__prereq_packages
     
   roles:
+    - provision_base
     - portal_edx
     - vidtest
       

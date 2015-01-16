@@ -23,9 +23,14 @@ dependencies:
   - certs
   - role: analytics-api
     when: ANALYTICS_API_GIT_IDENTITY
-  - role: test_portal
+  when: !edx__pre_installed
+
+dependencies:
+  - role: portal
     portal__subsites:
-      - name: "edx_lms"
-        urlpath: "/edx/lms"
-        port: "{{ EDXAPP_LMS_NGINX_PORT }}"
-        docroot: "/tmp/edx_lms"
+      - name: "edx_lms" 
+        urlpath: "{{ edx__lms_urlpath }}"
+        port: "{{ edx__lms_port }}"
+      - name: "edx_cms" 
+        urlpath: "{{ edx__cms_urlpath }}"
+        port: "{{ edx__cms_port }}"

@@ -20,7 +20,7 @@
 - name: Set up iptables 
   template:
     src={{ item }}
-    dest="{{ iptables__base_dir }}/rules"
+    dest="{{ iptables__base_dir }}/"
     mode="0744"
   with_items:
     - clear.sh

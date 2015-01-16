@@ -13,13 +13,13 @@
 case $1 in
 	start | reload | restart)
 		logger -t iptables -p info "Clearing iptables rules" "iptables"
-		{{ iptables__clear_script }}
+		{{ iptables__base_dir }}/clear.sh
 		logger -t iptables -p info "Loading iptables rules" "iptables"
-		{{ iptables__load_script }}
+		{{ iptables__base_dir }}/load.sh
 	;;
 	stop)
 		logger -t iptables -p info "Clearing iptables rules" "iptables"
-		{{ iptables__clear_script }}
+		{{ iptables__base_dir }}/clear.sh
     ;;
     status)
         for t in nat filter mangle 

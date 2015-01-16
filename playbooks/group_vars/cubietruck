@@ -1,7 +1,8 @@
 ---
 ifupdown: True
 ifupdown_ignore_networkmanager: True
-ifupdown_external_interface: "{{ ansible_default_ipv4.alias }}"
+#ifupdown_external_interface: "{{ ansible_default_ipv4.alias }}"
+ifupdown_external_interface: "eth0"
 ifupdown_internal_interface: "wlan0"
 ifupdown_interfaces: 
     - iface: "{{ ifupdown_external_interface }}"

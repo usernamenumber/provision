@@ -1,4 +1,5 @@
 ---
+edx_portal__enabled: false
 edx__lms_urlpath: "/edx"
 edx__lms_port: "{{ EDXAPP_LMS_NGINX_PORT }}"
 edx__cms_urlpath: "/edxcms"

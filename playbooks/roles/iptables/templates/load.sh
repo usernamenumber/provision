@@ -9,7 +9,7 @@ RULESDIR="${SCRIPTDIR}/rules.d"
 export IPTABLES=${IPTABLES:-{{ iptables__cmd }}}
 [ -e $RULESDIR ] || mkdir $RULESDIR
 cd $RULESDIR
-for s in $(ls)
+for s in $(ls *.conf)
 do
     source $s
 done
