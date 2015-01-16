@@ -12,4 +12,5 @@ data/packages/*
 force_groups
 provisioning.txt
 playbooks/localconfig.yml
+playbooks/roles.yml
 ext/*

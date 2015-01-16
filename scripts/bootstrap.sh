@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Fatal errors
+## Basic I/O functions
 function die() {
 	echo ""
 	echo "FATAL ERROR: $1" >&2
@@ -8,19 +8,37 @@ function die() {
 	exit 1
 }
 
-# Notifications and warnings
 function note() {
 	echo ""
 	echo "NOTICE: $1" >&2
 	echo ""
 }
 
-# Action messages
 function step() {
 	echo ""
 	echo "== $1"
 }
 
+## Configs
+# All of these can be overridden by setting them as environment vars
+PROVISION_AUTO_UPDATE=${PROVISION_AUTO_UPDATE:-true}
+PROVISION_BASE_DIR=${PROVISION_BASE_DIR:-"/usr/local/tunapanda"}
+## TODO: Change usernamenumber URLs back to tunapanda
+PROVISION_CORE_REPO=${PROVISION_CORE_REPO:-"http://github.com/usernamenumber/provision"}
+PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
+PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
+PROVISION_CORE_VERSION="${PROVISION_CORE_VERSION:-}" # default to current branch or master if no repo
+
+CUSTOM_PLAYBOOK=${PROVISION_CORE_DIR}/playbooks/localconfig.yml 
+if [ -f $CUSTOM_PLAYBOOK ]
+then
+    note "Using custom playbook $CUSTOM_PLAYBOOK"
+    PROVISION_CORE_PLAYBOOK=$CUSTOM_PLAYBOOK
+else
+    PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"playbooks/main.yml"}
+fi
+
+## Other support functions
 function has_internet() {
 	if [ -z "$HAS_INTERNET" ]
 	then
@@ -57,25 +75,6 @@ function get_url() {
 	fi
 }
 
-
-# Configs
-# All of these can be overridden by setting them as environment vars
-PROVISION_AUTO_UPDATE=${PROVISION_AUTO_UPDATE:-true}
-PROVISION_BASE_DIR=${PROVISION_BASE_DIR:-"/usr/local/tunapanda"}
-## TODO: Change usernamenumber URLs back to tunapanda
-PROVISION_CORE_REPO=${PROVISION_CORE_REPO:-"http://github.com/usernamenumber/provision"}
-PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
-PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
-PROVISION_CORE_VERSION="${PROVISION_CORE_VERSION:-}" # default to current branch or master if no repo
-
-CUSTOM_PLAYBOOK=${PROVISION_CORE_DIR}/playbooks/localconfig.yml 
-if [ -f $CUSTOM_PLAYBOOK ]
-then
-    note "Using custom playbook $CUSTOM_PLAYBOOK"
-    PROVISION_CORE_PLAYBOOK=$CUSTOM_PLAYBOOK
-else
-    PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"playbooks/main.yml"}
-fi
 if [ $EUID -ne 0 ]
 then
 	die 'Must be run as root!'
@@ -199,7 +198,7 @@ else
 fi
 
 step "Generating roles.yml"
-pushd ${PROVISION_CORE_DIR} > /dev/null
+pushd ${PROVISION_CORE_DIR}/playbooks > /dev/null
 cat > roles.yml <<EOF
 ---
 ### AUTO-GENERATED (changes will be lost) ###
