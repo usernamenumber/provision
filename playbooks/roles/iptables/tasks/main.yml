@@ -14,7 +14,7 @@
 - name: Create iptables rules dir
   file:
     state=directory
-    dest="{{ iptables__base_dir }}/rules"
+    dest="{{ iptables__base_dir }}/rules.d"
     mode="0755"
 
 - name: Set up iptables 

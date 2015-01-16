@@ -1,7 +1,7 @@
 location {{ item.urlpath }} {
 	{% if item.port is defined %}
 		rewrite {{ item.urlpath }}$ {{ item.urlpath }}/;
-		rewrite {{ item.urlpath }}/(.*)$ http://{{ provision__primary_iface.ipv4.address }}:18010/$1;
+		rewrite {{ item.urlpath }}/(.*)$ http://{{ provision__primary_iface.ipv4.address }}:{{ item.port }}/$1;
 	{% else %}
 		alias {{ item.docroot }};
 	{% endif %}

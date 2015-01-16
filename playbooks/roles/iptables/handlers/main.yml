@@ -1,3 +1,5 @@
 ---
 - name: reload iptables
-  command: "{{ iptables__base_dir }}/load.sh"
+  service: 
+    name=iptables
+    state=restarted
