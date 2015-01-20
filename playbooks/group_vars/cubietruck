@@ -1,4 +1,9 @@
 ---
+##
+## This file contains settings for a standalone ARM device that
+## serves as a wireless access point and has edX pre-installed
+##
+
 ifupdown: True
 ifupdown_ignore_networkmanager: True
 ifupdown_external_interface: "eth0"
