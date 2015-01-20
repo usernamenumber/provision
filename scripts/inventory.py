@@ -35,6 +35,8 @@ if os.path.exists(localconfig_fn):
     else:
         if localconfig.has_key("groups"):
             for group in localconfig["groups"]:
+                if group == "default":
+                    continue
                 list_output[group] = { "hosts": [ "127.0.0.1" ] }
 
         if localconfig.has_key("vars"):
