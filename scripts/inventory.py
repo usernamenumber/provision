@@ -33,8 +33,8 @@ if os.path.exists(localconfig_fn):
         sys.stderr.write("WARNING: Could not parse %s. Error text was '%s'\n" % (localconfig_fn,e))
         sys.exit(EBADFILE)
     else:
-        if localconfig.has_key("profiles"):
-            for group in localconfig["profiles"]:
+        if localconfig.has_key("groups"):
+            for group in localconfig["groups"]:
                 list_output[group] = { "hosts": [ "127.0.0.1" ] }
 
         if localconfig.has_key("vars"):

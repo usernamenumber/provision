@@ -1,7 +1,7 @@
 ---
 allow_duplicates: yes
 dependencies:
+  - bind
   - php 
-  - bind 
   - wap 
   - iptables 
