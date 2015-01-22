@@ -1,16 +1,27 @@
 ---
 - name: Initial timstamp
   hosts: all
-  tasks:
-    - shell: echo "Last provisioning started at $(date)" > {{ provision__base_dir }}/provisioning.txt
-
-- name: Main
-  hosts: all
-
   # TODO: Should this go elsewhere?
   handlers:
     - name: reload nginx
       service: name=nginx state=reloaded
+
+  tasks:
+    - shell: echo "Last provisioning started at $(date)" > {{ provision__base_dir }}/provisioning.txt
+
+- name: Base Setup
+  hosts: all
+  roles:
+    - provision_base
+
+- name: Supporting roles
+  hosts: all
+
+  tasks:
+    - name: Install nginx
+      apt:
+        name=nginx
+        state=installed
 
   include: roles.yml
 

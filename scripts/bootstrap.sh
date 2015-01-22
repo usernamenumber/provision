@@ -28,14 +28,13 @@ PROVISION_CORE_REPO=${PROVISION_CORE_REPO:-"http://github.com/usernamenumber/pro
 PROVISION_CORE_DIR=${PROVISION_CORE_DIR:-"${PROVISION_BASE_DIR}/provision"}
 PROVISION_CORE_INVENTORY=${PROVISION_CORE_INVENTORY:-"${PROVISION_CORE_DIR}/scripts/inventory.py"}
 PROVISION_CORE_VERSION="${PROVISION_CORE_VERSION:-}" # default to current branch or master if no repo
+PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"${PROVISION_CORE_DIR}/playbooks/main.yml"}
 
-CUSTOM_PLAYBOOK=${PROVISION_CORE_DIR}/playbooks/localconfig.yml 
+CUSTOM_PLAYBOOK=${PROVISION_CORE_DIR}/custom.yml 
 if [ -f $CUSTOM_PLAYBOOK ]
 then
     note "Using custom playbook $CUSTOM_PLAYBOOK"
     PROVISION_CORE_PLAYBOOK=$CUSTOM_PLAYBOOK
-else
-    PROVISION_CORE_PLAYBOOK=${PROVISION_CORE_PLAYBOOK:-"playbooks/main.yml"}
 fi
 
 ## Other support functions
@@ -203,17 +202,21 @@ cat > roles.yml <<EOF
 ---
 ### AUTO-GENERATED (changes will be lost) ###
 - hosts: all
+  handlers:
+    - name: reload nginx
+      service: name=nginx state=reloaded
+    
   roles:
 EOF
-  for r in $(find roles/ -maxdepth 1 -mindepth 1 -type d)
+  for r in $(find roles/ -maxdepth 1 -mindepth 1 -type d -not -name provision_base)
   do
-          f=$(basename $r);
-              echo "    - { role: $f, when: ${f}__enabled is defined and ${f}__enabled }" >> roles.yml
-          done
+      f=$(basename $r);
+      echo "    - { role: $f, when: ${f}__enabled is defined and ${f}__enabled }" >> roles.yml
+  done
 popd > /dev/null
 
 step "Running core playbook, ${PROVISION_CORE_PLAYBOOK}"
-pushd ${PROVISION_CORE_DIR} > /dev/null
+pushd ${PROVISION_CORE_DIR}/playbooks > /dev/null
 ansible-playbook -vvv \
     -i $PROVISION_CORE_INVENTORY \
     $PROVISION_CORE_PLAYBOOK || die "Could not run core playbook"

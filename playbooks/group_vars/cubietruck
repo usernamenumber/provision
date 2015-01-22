@@ -3,11 +3,10 @@
 ## This file contains settings for a standalone ARM device that
 ## serves as a wireless access point and has edX pre-installed
 ##
-
+provision__wan_iface: "{{ ansible_eth1|default('') }}"
+provision__lan_iface: "{{ ansible_wlan0 }}"
 ifupdown: True
 ifupdown_ignore_networkmanager: True
-ifupdown_external_interface: "eth0"
-ifupdown_internal_interface: "wlan0"
 ifupdown_interfaces: 
     - iface: "{{ ifupdown_external_interface }}"
       inet: 'dhcp'
@@ -27,3 +26,5 @@ kalite__enabled: true
 # this changes what our options are for 
 # (re-)configuring it.
 edx__pre_installed: true
+portal__sites_available_dir: "/edx/app/nginx/sites-available/"
+portal__sites_enabled_dir: "/edx/app/nginx/sites-enabled/"

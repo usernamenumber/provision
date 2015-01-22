@@ -7,12 +7,12 @@
 ##
 
 # Network setup
+provision__wan_iface: "{{ ansible_eth1 }}"
+provision__lan_iface: "{{ ansible_eth0 }}"
 ifupdown: True
 ifupdown_ignore_networkmanager: True
-ifupdown_external_interface: "eth1"
-ifupdown_internal_interface: "eth0"
 ifupdown_interfaces: 
-    - iface: "{{ ifupdown_internal_interface }}"
+    - iface: "{{ provision_lan_interface }}"
       inet: 'static'
       options: | 
         address "10.0.0.1"
