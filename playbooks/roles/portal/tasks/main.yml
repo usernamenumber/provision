@@ -5,6 +5,7 @@
     state=installed
   with_items:
      - nginx
+     - php5
      - php5-fpm
      - conntrack
      - psmisc
@@ -12,6 +13,11 @@
 - name: Nginx should be running
   service:
     name=nginx
+    state=started
+
+- name: PHP FPM should be running
+  service:
+    name=php5-fpm
     state=started
 
 - name: Remove nginx default page
@@ -56,12 +62,12 @@
 - name: Deploy site config
   template:
     src=nginx/portal.j2
-    dest={{ provision__sites_available_dir }}/portal
+    dest={{ portal__base }}/portal.conf
     owner=root group={{ common_web_user }} mode=0640
 
 - name: Activate site config
   file:
-    src={{ provision__sites_available_dir }}/portal
+    src={{ portal__base }}/portal.conf
     dest={{ provision__sites_enabled_dir }}/portal
     state=link owner=root group=root
   notify: reload nginx
