@@ -116,9 +116,9 @@ then
 	step "Installing Ansible"
 	has_internet || die "Ansible is required, but we can't install it without a net connection"	
 	apt-get install -y python-dev
-	pip install --upgrade 'ansible>=1.6'
-	is_installed ansible || die "Something went wrong installing ansible. Cannot continue."
 fi
+pip install --upgrade 'ansible>=1.6'
+is_installed ansible || die "Something went wrong installing ansible. Cannot continue."
 
 if [ ! -f /root/.ssh/provisioning ]
 then
