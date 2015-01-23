@@ -29,6 +29,5 @@
     dest={{ dir }}
     version={{ ver }}
     recursive=yes
-    track_submodules=yes
   when: d.stat.exists == False
   
