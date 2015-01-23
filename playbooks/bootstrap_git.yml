@@ -18,7 +18,6 @@
     update=yes
     force=no
     recursive=yes
-    track_submodules=yes
   ignore_errors: yes
   when: d.stat.exists == True
   
