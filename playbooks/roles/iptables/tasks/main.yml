@@ -25,9 +25,10 @@
   with_items:
     - clear.sh
     - load.sh
-  notify:
-    - reload iptables
+
+- name: Create init script
+  template: src=iptables_init_script.j2 dest=/etc/init.d/iptables owner=root group=root mode=751
 
 - name: Autoload the rules
-  template: src=iptables_init_script.j2 dest=/etc/init.d/iptables owner=root group=root mode=751
+  service: name=iptables state=started enabled=yes
 
