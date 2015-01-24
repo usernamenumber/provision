@@ -32,7 +32,7 @@
     dest=/edx/app/nginx/sites-available/lms 
     regexp='^(\s*)listen' 
     backrefs=yes 
-    line='\1listen {{ EDXAPP_LMS_NGINX_PORT }} default' 
+    line='\1listen {{ EDXAPP_LMS_NGINX_PORT }} default;' 
     state=present
   when: edx__pre_installed is defined and edx__pre_installed
 
@@ -71,5 +71,3 @@
     dest={{ provision__sites_enabled_dir }}/portal
     state=link owner=root group=root
   notify: reload nginx
-  
-- include: portal_site.yml

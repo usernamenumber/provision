@@ -1,6 +1,6 @@
 ---
 dependencies:
-  - role: portal
+  - role: portal_subsite
     portal__subsites:
       - name: "videotest" 
         docroot: "{{ vidtest__docroot }}"
