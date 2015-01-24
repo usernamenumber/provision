@@ -10,7 +10,12 @@
      - conntrack
      - psmisc
 
-- name: Nginx should be running
+- name: Disable Apache
+  service:
+    name=apache2
+    state=stopped
+
+- name: Enable Nginx 
   service:
     name=nginx
     state=started
@@ -32,7 +37,7 @@
     dest=/edx/app/nginx/sites-available/lms 
     regexp='^(\s*)listen' 
     backrefs=yes 
-    line='\1listen {{ EDXAPP_LMS_NGINX_PORT }} default' 
+    line='\1listen {{ EDXAPP_LMS_NGINX_PORT }} default;'
     state=present
   when: edx__pre_installed is defined and edx__pre_installed
 

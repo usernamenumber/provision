@@ -2,14 +2,6 @@
 # Need to load module bcmdhd. Edit /etc/modules to include bcmdhd
 # TODO: This does not actually reload the module with the desired arguments
 # There must be a reliable way that doesn't require a reboot. Investigate.
-- lineinfile:
-    dest=/etc/modules
-    line="bcmdhd op_mode=2"
-    regexp="^bcmdhd"
-
-- name: "Load wlan driver"
-  command: modprobe bcmdhd
-  ignore_errors: yes
 
 # Install the package "hostapd"
 - apt: name=hostapd state=present
@@ -32,6 +24,9 @@
       src="firewall/masquerade.j2"
       dest="{{ iptables__rules_dir }}/masquerade.conf"
       backup=yes
-  notify:
-    - reload iptables
+  notify: reload iptables
 
+- name: Hostapd should be running
+  service: 
+    name=hostapd
+    state=started

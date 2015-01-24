@@ -3,18 +3,18 @@
 ## This file contains settings for a standalone ARM device that
 ## serves as a wireless access point and has edX pre-installed
 ##
-provision__wan_iface: "{{ ansible_eth1|default('') }}"
-provision__lan_iface: "{{ ansible_wlan0 }}"
 ifupdown: True
 ifupdown_ignore_networkmanager: True
+ifupdown_external_interface: "eth0"
+ifupdown_internal_interface: "wlan0"
 ifupdown_interfaces: 
-    - iface: "{{ ifupdown_external_interface }}"
-      inet: 'dhcp'
+    - iface: "{{ ifupdown_external_interface  }}"
+      inet: "dhcp"
     - iface: "{{ ifupdown_internal_interface }}"
-      inet: 'static'
+      inet: "static"
       options: | 
-        address "10.0.0.1"
-        netmask "255.0.0.0"
+        address 10.0.0.1
+        netmask 255.0.0.0
 
 wap__enabled: true
 portal__enabled: true

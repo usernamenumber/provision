@@ -3,5 +3,4 @@ allow_duplicates: yes
 dependencies:
   - bind
   - php 
-  - wap 
   - iptables 
