@@ -76,5 +76,3 @@
     dest={{ provision__sites_enabled_dir }}/portal
     state=link owner=root group=root
   notify: reload nginx
-  
-- include: portal_site.yml

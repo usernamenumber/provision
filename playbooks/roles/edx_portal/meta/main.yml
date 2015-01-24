@@ -1,6 +1,6 @@
 ---
 dependencies:
-  - role: portal
+  - role: portal_subsite
     portal__subsites:
       - name: "edx_lms" 
         urlpath: "{{ edx__lms_urlpath }}"
