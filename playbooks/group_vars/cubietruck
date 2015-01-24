@@ -26,5 +26,7 @@ kalite__enabled: true
 # this changes what our options are for 
 # (re-)configuring it.
 edx__pre_installed: true
-portal__sites_available_dir: "/edx/app/nginx/sites-available/"
-portal__sites_enabled_dir: "/edx/app/nginx/sites-enabled/"
+provision__sites_available_dir: "/edx/app/nginx/sites-available/"
+provision__sites_enabled_dir: "/edx/app/nginx/sites-enabled/"
+php__fpm_url: "unix:/var/run/php5-fpm.sock"
+portal__auth: "agreement"

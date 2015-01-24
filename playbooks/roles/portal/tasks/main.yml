@@ -41,30 +41,24 @@
     state=present
   when: edx__pre_installed is defined and edx__pre_installed
 
-- name: Installing rmtrack script
-  copy:
-    src=rmtrack
-    dest=/usr/bin/
-    mode=0755
-
-- include: auto_auth.yml
-  when: portal__auth == "auto"
-
-- include: captive.yml
-  when: portal__auth == "email"
-
 - name: Create site content dirs
   file: 
     path={{ item }}
     state=directory
-    owner=root group={{ common_web_user }} mode=755 
+    owner=root group={{ common_web_user }} mode=775 
   with_items:
-    - "{{ portal__docroot }}"
     - "{{ portal__redirects }}"
+
+- name: Link docroot to role site data
+  file:
+    path={{ portal__docroot }}
+    src={{ portal__site_content }}
+    state=link
+  when: portal__docroot != portal__site_content
 
 - name: Install portal landing page
   template:
-    src=site/index.php.j2
+    src=site/index.php
     dest={{ portal__docroot }}/index.php
 
 - name: Deploy site config
@@ -79,3 +73,13 @@
     dest={{ provision__sites_enabled_dir }}/portal
     state=link owner=root group=root
   notify: reload nginx
+
+- name: Installing rmtrack script
+  copy:
+    src=rmtrack
+    dest=/usr/bin/
+    mode=0755
+
+- include: captive.yml
+  when: portal__auth is defined and portal__auth != "none"
+  notify: reload iptables

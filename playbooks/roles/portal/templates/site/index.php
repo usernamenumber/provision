@@ -1,9 +1,13 @@
+{% include 'auth.php' %}
 <!DOCTYPE html><html lang=en>
 <head>
   <meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content=""><meta name="author" content="">
   <meta http-equiv="cache-control" content="no-cache">
   <link href="styles/eb66b09d.main-ltr.css" rel="stylesheet">
   <title>{{ portal__title }}</title>
+  <style>
+  {% include 'auth_styles.css' %}
+  </style>
 </head>
 <body id=page-top class=index>
 <!-- Header -->
@@ -21,8 +25,10 @@
 	<div class=row>
 		<div class=col-lg-8>
 			<h3>About</h3>
-			<p>x2go is a collection of free learning materials hosted in a standalone box without requiring internet.</p>
-            {% if portal__auth != "none" %}<?php include("auth.php"); ?>{% endif %}
+            {{ portal__description }}
+<?php
+            do_auth("{{ portal__auth }}");
+?>
 		</div>
 	</div>
 </div>
