@@ -47,8 +47,11 @@
     dest=/usr/bin/
     mode=0755
 
+- include: auto_auth.yml
+  when: portal__auth == "auto"
+
 - include: captive.yml
-  when: portal__require_login
+  when: portal__auth == "email"
 
 - name: Create site content dirs
   file: 

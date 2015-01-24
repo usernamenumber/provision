@@ -16,7 +16,10 @@ ifupdown_interfaces:
         address "10.0.0.1"
         netmask "255.0.0.0"
 
+portal__auth: "auto"
+
 # Enabled roles
 portal__enabled: true
-vidtest__enabled: true
-kalite__enabled: true
+#vidtest__enabled: true
+#kalite__enabled: true
+

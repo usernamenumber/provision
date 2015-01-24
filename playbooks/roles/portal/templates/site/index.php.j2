@@ -22,7 +22,7 @@
 		<div class=col-lg-8>
 			<h3>About</h3>
 			<p>x2go is a collection of free learning materials hosted in a standalone box without requiring internet.</p>
-            {% if portal__require_login %}<?php include("auth.php"); ?>{% endif %}
+            {% if portal__auth != "none" %}<?php include("auth.php"); ?>{% endif %}
 		</div>
 	</div>
 </div>
